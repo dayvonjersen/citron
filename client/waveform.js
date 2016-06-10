@@ -16,7 +16,8 @@ function _drawWaveform(container, audioData) {
     let canvasCtx = canvasElement.getContext('2d');
 
     audioCtx.decodeAudioData(audioData, (audioBuffer) => {
-        let width = Math.round(audioBuffer.duration * minPxPerSec * pixelRatio)
+        let width = Math.round(audioBuffer.duration * minPxPerSec * pixelRatio);
+        canvasElement.width = width;
         let peaks = getPeaks(audioBuffer, width);
         drawPeaks(canvasCtx, peaks, width);
         containerElement.innerHTML = `<img src="${ canvasElement.toDataURL() }" alt="whoops">`;

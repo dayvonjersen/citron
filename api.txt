@@ -1,0 +1,14 @@
+POST {
+    fileName
+    magnetURI
+    waveformURI
+    duration
+}
+
+GET {
+    fileName
+    magnetURI
+    waveformURI
+    duration
+    created_at
+}
