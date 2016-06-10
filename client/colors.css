@@ -1,0 +1,39 @@
+/*
+
+blue:
+
+#0170c2
+rgba(1,112,194,1)
+
+
+white:
+
+#fefbf6
+rgba(254,251,246,1)
+
+
+yellow:
+
+#fef200
+rgba(254,242,0,1)
+
+
+black:
+
+#1e181a
+rgba(30,24,26,1)
+
+
+red:
+
+#ed1b24
+rgba(237,27,36,1)
+*/
+
+:root {
+    --blue:     #0170c2;
+    --white:    #fefbf6;
+    --yellow:   #fef200;
+    --black:    #1e181a;
+    --red:      #ed1b24;
+}
