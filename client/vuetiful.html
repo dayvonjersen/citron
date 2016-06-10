@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+    <title>Hello, Vue</title>
+    <script src="vue.js"></script>
+    <body>
+        <div id="app">
+            a=<input v-model="a"> b={{ b }}
+        </div>
+
+        <script>
+            let vm = new Vue({
+                el: '#app',
+                data: {
+                    a: 1
+                },
+                computed: {
+                    b: function() {
+                        return parseInt(this.a,10) + 1
+                    }
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -7,6 +7,7 @@
     "browserify": "^13.0.1",
     "drag-drop": "^2.11.0",
     "parse-torrent": "^5.7.3",
+    "vue": "^1.0.24",
     "webtorrent": "^0.94.3"
   },
   "devDependencies": {},
