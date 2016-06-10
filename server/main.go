@@ -1,32 +1,32 @@
 package main
 
 import (
-	"io"
+	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"golang.org/x/net/websocket"
 )
 
-func echo(ws *websocket.Conn) {
-	io.Copy(ws, ws)
+type suprême struct {
+	fileName    string    `json:"fileName"`
+	magnetURI   string    `json:"magnetURI"`
+	waveformURI string    `json:"waveformURI"`
+	duration    time.Time `json:"duration"`
+	createdAt   time.Time `json:"createdAt"`
 }
 
-type test struct {
-	value int `json:"test"`
-}
-
-func j(ws *websocket.Conn) {
-	var t test
+func index(ws *websocket.Conn) {
 	for {
-		websocket.JSON.Receive(ws, &t)
-		log.Printf("got: %#v\n", t.value)
+		str, _ := json.Marshal(suprême{"only a test", "asdf", "waveform.png", time.Now(), time.Now()})
+		websocket.Message.Send(ws, str)
+		log.Printf("sent: %#v\n", str)
 	}
 }
 
 func main() {
-	http.Handle("/echo", websocket.Handler(echo))
-	http.Handle("/j", websocket.Handler(j))
+	http.Handle("/", websocket.Handler(index))
 	log.Println("Listening on :12345")
 	log.Panicln(http.ListenAndServe(":12345", nil))
 }
