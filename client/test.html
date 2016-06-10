@@ -1,0 +1,22 @@
+<!doctype html>
+<html>
+    <head>
+        <title>test</title>
+    </head>
+    <body>
+        <div id="dropzone" style="border:5px dashed;padding:125px"><h1>HELLO?</h1></div>
+        <script src="dragdrop.min.js"></script>
+        <script src="webtorrent.min.js"></script>
+<script>
+let client = new WebTorrent();
+DragDrop('#dropzone', (files) => {
+    client.seed(files, (torrent) => {
+        let client2 = new WebTorrent();
+        client2.add(torrent.magnetURI, (torrent) => {
+            torrent.files[0].appendTo('body');
+        });
+    });
+});
+</script>
+    </body>
+</html>
