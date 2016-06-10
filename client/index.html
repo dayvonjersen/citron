@@ -63,12 +63,16 @@ window.addEventListener("load", () => {
         let fileName = tpl.querySelector('.fileName');
         //let magnetURI = tpl.querySelector('.magnetURI');
         let waveformURI = tpl.querySelector('.waveformURI');
-        let duration = tpl.querySelector('.duration');
+        let durationEl = tpl.querySelector('.duration');
         let createdAt = tpl.querySelector('.createdAt');
 
         fileName.innerHTML = data.fileName;
-        createdAt.innerHTML = data.createdAt;
-        duration.innerHTML = data.duration;
+
+        let created = new Date(data.createdAt);
+        createdAt.innerHTML = created.getSeconds() + " seconds ago";
+
+        let duration = new Date(data.duration);
+        durationEl.innerHTML = duration.getMinutes() + ":" + duration.getSeconds();
 
         waveformURI.src = data.waveformURI;
 
@@ -80,13 +84,12 @@ window.addEventListener("load", () => {
      */
     mainElement.innerHTML = "";
 
-    addChild({
-        fileName: "only a test",
-        createdAt: "30 seconds ago",
-        duration: "69:69",
-        waveformURI: "waveform.png"
-    });
-
+    try {
+        let ws = new WebSocket("ws://" + location.host + ":12345/");
+        ws.onmessage = (evt) => addChild(JSON.parse(evt.data));
+    } catch(err) {
+        mainElement.innerHTML = err.message
+    }
 
 });
             /*
