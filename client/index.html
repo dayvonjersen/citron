@@ -56,6 +56,50 @@ window.addEventListener("load", () => {
 
     let mainElement = document.querySelector("main");
 
+    let ftime = (time, amount, unit) => {
+        if(time >= amount) {
+            let d = parseInt(time/amount, 10);
+            return [`${d} ${unit}${d == 1 ? '' : 's'}`, parseInt(time%amount, 10)];
+        } else {
+            return ['', time];
+        }
+    };
+
+    let fdate = (date) => {
+        let diff = ( (new Date()).getTime() - date.getTime() ) / 1000;
+        if(diff < 1) {
+            return 'just now!';
+        }
+
+        let ret = [];
+        var tmp = ftime(diff, 31536000, 'year');
+        ret[ret.length] = tmp[0]; diff = tmp[1];
+        tmp = ftime(diff, 2592000, 'month');
+        ret[ret.length] = tmp[0]; diff = tmp[1];
+        tmp = ftime(diff, 604800, 'week');
+        ret[ret.length] = tmp[0]; diff = tmp[1];
+        tmp = ftime(diff, 86400, 'day');
+        ret[ret.length] = tmp[0]; diff = tmp[1];
+        tmp = ftime(diff, 3600, 'hour');
+        ret[ret.length] = tmp[0]; diff = tmp[1];
+        tmp = ftime(diff, 60, 'minute');
+        ret[ret.length] = tmp[0]; diff = tmp[1];
+        tmp = ftime(diff, 1, 'second');
+        ret[ret.length] = tmp[0]; 
+
+        return ret.filter((s)=>s).join(" ") + " ago";
+    };
+
+    let zeroPad = (x) => `${x < 10 ? '0' : ''}${x}`;
+
+    let fduration = (s) => {
+        let h = parseInt(s / 3600, 10);
+        s %= 3600;
+        let m = parseInt(s / 60, 10);
+        s %= 60;
+        return `${h > 0 ? zeroPad(h)+':' : ''}${zeroPad(m)}:${zeroPad(s)}`;
+    };        
+
     let addChild = (data) => {
 
         let tpl = getTemplate("supreme");
@@ -63,16 +107,15 @@ window.addEventListener("load", () => {
         let fileName = tpl.querySelector('.fileName');
         //let magnetURI = tpl.querySelector('.magnetURI');
         let waveformURI = tpl.querySelector('.waveformURI');
-        let durationEl = tpl.querySelector('.duration');
+        let duration = tpl.querySelector('.duration');
         let createdAt = tpl.querySelector('.createdAt');
 
         fileName.innerHTML = data.fileName;
 
         let created = new Date(data.createdAt);
-        createdAt.innerHTML = created.getSeconds() + " seconds ago";
+        createdAt.innerHTML = fdate(created);
 
-        let duration = new Date(data.duration);
-        durationEl.innerHTML = duration.getMinutes() + ":" + duration.getSeconds();
+        duration.innerHTML = fduration(data.duration);
 
         waveformURI.src = data.waveformURI;
 

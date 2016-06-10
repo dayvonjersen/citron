@@ -13,7 +13,7 @@ type Suprême struct {
 	FileName    string    `json:"fileName"`
 	MagnetURI   string    `json:"magnetURI"`
 	WaveformURI string    `json:"waveformURI"`
-	Duration    time.Time `json:"duration"`
+	Duration    uint64    `json:"duration"`
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
@@ -28,7 +28,7 @@ func index(ws *websocket.Conn) {
 
 	for {
 		<-time.After(time.Second * 2)
-		str, _ := json.Marshal(Suprême{"only a test", "asdf", "waveform.png", time.Now(), time.Now()})
+		str, _ := json.Marshal(Suprême{"only a test", "asdf", "waveform.png", 3695, time.Now()})
 		ws.Write(str)
 		log.Printf("sent: %s\n", str)
 	}
