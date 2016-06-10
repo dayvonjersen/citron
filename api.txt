@@ -10,5 +10,5 @@ GET {
     magnetURI
     waveformURI
     duration
-    created_at
+    createdAt
 }

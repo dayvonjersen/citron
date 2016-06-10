@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
     <head>
-        <title>🍋 CiTRON &mdash; freshly-squeezed ♫</title>
+        <title>CiTRON &mdash; freshly-squeezed ♫</title>
 
         <!--
             CSS
@@ -38,55 +38,20 @@
 
                     </div>
                     <div style="flex:auto">
-                        <h1>
-                            <span class="fileName"></span>
-                            <span class="createdAt" style="font-size:12px;float:right;color:#ccc"></span>
-                        </h1>
-                        <img class="wave waveformURI">
+                        <h1>Unknown Artist &mdash; &ldquo;Untitled&rdquo;<span style="font-size:12px;float:right;color:#ccc">10 seconds ago</span></h1>
+                        <img src="waveform.png" class="wave">
                     </div>
                 </div>
-                <time class="duration"></time>
+                <time>05:18</time>
             </article>
         </template>
 
         <script>
 window.addEventListener("load", () => {
 
-    let getTemplate = (id) => document.getElementById(id).content.cloneNode(true);
-
-    let mainElement = document.querySelector("main");
-
-    let addChild = (data) => {
-
-        let tpl = getTemplate("supreme");
-
-        let fileName = tpl.querySelector('.fileName');
-        //let magnetURI = tpl.querySelector('.magnetURI');
-        let waveformURI = tpl.querySelector('.waveformURI');
-        let duration = tpl.querySelector('.duration');
-        let createdAt = tpl.querySelector('.createdAt');
-
-        fileName.innerHTML = data.fileName;
-        createdAt.innerHTML = data.createdAt;
-        duration.innerHTML = data.duration;
-
-        waveformURI.src = data.waveformURI;
-
-        mainElement.appendChild(tpl);
-    };
-
-    /**
-     * init 
-     */
-    mainElement.innerHTML = "";
-
-    addChild({
-        fileName: "only a test",
-        createdAt: "30 seconds ago",
-        duration: "69:69",
-        waveformURI: "waveform.png"
-    });
-
+    let tpl = document.getElementById("supreme").content.cloneNode(true);
+    document.querySelector("main").innerHTML = "";
+    document.querySelector("main").appendChild(tpl);
 
 });
             /*
@@ -105,8 +70,8 @@ window.addEventListener("load", () => {
                             wavesurfer.loadArrayBuffer(buffer);
                         });
                     });
-                });
-            });*/
+                });*/
+            });
         </script>
     </body>
 </html>
