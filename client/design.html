@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+    <head>
+        <title>citron &mdash; freshly-squeezed audio</title>
+        <link rel="stylesheet" href="reset.css">
+        
+        <style>
+html, body {
+    font-family: sans-serif;
+    background: #fefbf6;
+    color: #1e181a;
+}
+body {
+    width: 80%;
+    margin: auto;
+}
+
+.play {
+    width: 96px;
+    height: 96px;
+    fill: #fef200;
+    box-shadow: 0 0 0 2px #fff, -32px 0 108px -5px rgba(254,242,0,1);
+    border-radius: 50%;
+/*    filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));*/
+}
+
+.wave {
+    width: 100%;
+    height:100px;
+}
+
+h1 {
+    font-size: 26px;
+    margin-bottom: 2px;
+}
+
+time {
+    position:absolute;
+    right:0;
+    bottom:0;
+    background:#1e181a;
+    color:#f3fbf6;
+    padding: 2px 4px;
+}
+
+header {
+    height: 64px;
+}
+
+article {
+    margin: 64px 0;
+}
+        </style>
+    </head>
+    <body>
+        <header>
+            <img src="upload.svg" style="display:inline;width:32px;height:32px;float:right;margin-top:16px;">
+        </header>
+
+        <article style="position:relative">
+            <div style="display:flex;flex-wrap:nowrap;align-items:center">
+                <div style="flex:0 1 auto;margin-right:16px;">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="play">
+                        <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M45,72.4H33V27.2h12V72.4z M67,72.4H55 V27.2h12V72.4z"/>
+                    </svg>
+
+                </div>
+                <div style="flex:auto">
+                    <h1>Unknown Artist &mdash; &ldquo;Untitled&rdquo;<span style="font-size:12px;float:right;color:#ccc">10 seconds ago</span></h1>
+                    <img src="waveform.png" class="wave">
+                </div>
+            </div>
+            <time>05:18</time>
+        </article>
+
+        <article style="position:relative">
+            <div style="display:flex;flex-wrap:nowrap;align-items:center">
+                <div style="flex:0 1 auto;margin-right:16px;">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="play">
+                        <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M38.7,72.4V27.2l34.9,22.6L38.7,72.4z"/>
+                    </svg>
+                </div>
+                <div style="flex:auto">
+                    <h1>Unknown Artist &mdash; &ldquo;Untitled&rdquo;</h1>
+                    <img src="waveform.png" class="wave">
+                </div>
+            </div>
+            <time>05:18</time>
+        </article>
+
+
+        <article style="position:relative">
+            <div style="display:flex;flex-wrap:nowrap;align-items:center">
+                <div style="flex:0 1 auto;margin-right:16px;">
+                    <svg version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="play">
+                        <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M38.7,72.4V27.2l34.9,22.6L38.7,72.4z"/>
+                    </svg>
+                </div>
+                <div style="flex:auto">
+                    <h1>Unknown Artist &mdash; &ldquo;Untitled&rdquo;</h1>
+                    <img src="waveform.png" class="wave">
+                </div>
+            </div>
+            <time>05:18</time>
+        </article>
+    </body>
+</html>
