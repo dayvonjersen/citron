@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"io"
 	"log"
 	"net/http"
@@ -14,22 +13,14 @@ func echo(ws *websocket.Conn) {
 }
 
 type test struct {
-	test string `json:"test"`
+	value int `json:"test"`
 }
 
 func j(ws *websocket.Conn) {
-
-	dec := json.NewDecoder(ws)
+	var t test
 	for {
-		var t test
-		if err := dec.Decode(&t); err == nil || err == io.EOF {
-			log.Printf("got: %#v\n", t)
-			if err == io.EOF {
-				break
-			}
-		} else if err != nil {
-			log.Fatalln("err:", err.Error())
-		}
+		websocket.JSON.Receive(ws, &t)
+		log.Printf("got: %#v\n", t.value)
 	}
 }
 
