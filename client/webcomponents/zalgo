@@ -1,0 +1,140 @@
+#!/usr/bin/env php
+<?php
+if(!defined('STDIN')) {
+    echo "Run from command-line pls.\n";
+    exit(1);
+}
+
+if(!file_exists('vendor/autoload.php')) {
+    echo "$ composer install\n";
+    exit(1);
+}
+require_once 'vendor/autoload.php';
+
+use Masterminds\HTML5;
+use Leafo\ScssPhp\Compiler as SCSS;
+
+function usage() {
+    echo "usage: zalgo [OPTIONS] \n";
+    echo "options:\n";
+    echo "--single=input-file - an input-file.html in src/\n";
+    echo "--src-dir=src       - path to use as source (default src/)\n";
+    echo "--tmp-dir=tmp       - path to use for temp  (default tmp/)\n";
+    echo "--dist-dir=dist     - path to use as dist  (default dist/)\n";
+    exit(2);
+}
+
+$options = getopt('', [
+    'single:',
+    'src-dir:',
+    'tmp-dir:',
+    'dist-dir:'
+]);
+
+function opterror($opt, $val, $msg) {
+    echo "invalid value passed to --$opt:\n";
+    echo $val, ' ', $msg, "\n";
+    exit(1);
+}
+
+foreach(['src','tmp','dist'] as $d) {
+    $def = $d;
+    $opt = "$d-dir";
+    if(isset($options[$opt])) {
+        $usrdir = $options[$opt];
+        switch(true) {
+        case !is_dir($usrdir):
+            opterror($opt, $usrdir, 'is not a directory.');
+        case !is_readable($usrdir):
+            opterror($opt, $usrdir, 'is not readable.');
+        case $opt !== 'src-dir' && !is_writable($usrdir):
+            opterror($opt, $usrdir, 'is not writable.');
+        }
+        $def = $usrdir;
+    }
+    define(strtoupper($d).'_DIR', rtrim($def, DIRECTORY_SEPARATOR) . '/');
+}
+
+function getElement($document, $tagName, $textOnly = false) {
+    $ret = '';
+    foreach($document->getElementsByTagName($tagName) as $element) {
+        if($textOnly) {
+            $ret .= $element->textContent;
+        } else {
+            $ret .= $document->saveXML($element,LIBXML_NOEMPTYTAG);
+        }
+        break;
+    }
+    return $ret;
+}
+
+function compile($input) {
+    if(!file_exists($input) || !is_readable($input) || is_dir($input)) {
+        echo "nonexistent or unreadable file $input\n";
+        usage();
+    }
+    echo "compiling $input...\n";
+
+    $html5 = new HTML5();
+    $document = $html5->loadHTML(file_get_contents($input));
+    $document->formatOutput = false;
+    $document->preserveWhitespace = false;
+
+    $nodeList = $document->getElementsByTagName('element');
+    if($nodeList->length !== 1) {
+        echo "Missing <element>\n";
+        exit(1);
+    }
+    $elementElement = $nodeList->item(0);
+    $elementTag = $elementElement->attributes->getNamedItem('name');
+    if(!$elementTag) {
+        echo "Missing ``name'' attribute for <element>.\n";
+        exit(1);
+    }
+    $elementTag = $elementTag->value;
+    if("$elementTag.html" !== basename($input)) {
+        echo "WARN: element name: ``$elementTag''\n";
+        echo "does not match filename: $input\n";
+    }
+    $elementName = '';
+    foreach(explode('-', $elementTag) as $bit) {
+        $elementName .= ucfirst($bit);
+    }
+
+    $css = getElement($document, 'style', true);
+    $tpl = getElement($document, 'template', false);
+    $tpl = addslashes($tpl);
+    $tpl = preg_replace('/\n+/m', '', $tpl);
+    $tpl = preg_replace('/\s+/m', ' ', $tpl);
+    $tpl = preg_replace('/<template>(.*)<\/template>/', '\1', $tpl); // HE COMES
+    $js  = getElement($document, 'script', true);
+
+    $scss = new SCSS();
+    $scss->setFormatter('Leafo\ScssPhp\Formatter\\Expanded');
+    $css_out = $scss->compile("$elementTag { $css }");
+    file_put_contents(TMP_DIR.$elementTag.'.css', $css_out);
+    
+    $js_out  = <<<JAVASCRIPT
+;(function(){
+$js
+Register("$elementName", "$elementTag", Z, "$tpl");
+})();
+JAVASCRIPT;
+    file_put_contents(TMP_DIR.$elementTag.'.js', $js_out);
+}
+
+if(isset($options['single'])) {
+    if(!is_array($options['single'])) {
+        $options['single'] = [$options['single']];
+    }
+    foreach($options['single'] as $filename) {
+        $filename = pathinfo($filename, PATHINFO_FILENAME);
+        compile(SRC_DIR.$filename.'.html');
+    }
+} else {
+    $d = dir(SRC_DIR);
+    while(($f = $d->read())!==false) {
+        if(is_dir($f) || pathinfo($f, PATHINFO_EXTENSION) !== 'html' || $f[0] === '.') continue;
+        compile(SRC_DIR.$f);
+    }
+}
