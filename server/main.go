@@ -18,11 +18,19 @@ type Suprême struct {
 }
 
 func index(ws *websocket.Conn) {
+	go func() {
+		for {
+			var s Suprême
+			err := websocket.JSON.Receive(ws, &s)
+			log.Printf("got: %#v, %v\n", s, err)
+		}
+	}()
+
 	for {
 		<-time.After(time.Second * 2)
 		str, _ := json.Marshal(Suprême{"only a test", "asdf", "waveform.png", time.Now(), time.Now()})
 		ws.Write(str)
-		log.Printf("sent: %#v\n", str)
+		log.Printf("sent: %s\n", str)
 	}
 }
 
