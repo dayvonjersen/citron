@@ -9,18 +9,19 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-type suprême struct {
-	fileName    string    `json:"fileName"`
-	magnetURI   string    `json:"magnetURI"`
-	waveformURI string    `json:"waveformURI"`
-	duration    time.Time `json:"duration"`
-	createdAt   time.Time `json:"createdAt"`
+type Suprême struct {
+	FileName    string    `json:"fileName"`
+	MagnetURI   string    `json:"magnetURI"`
+	WaveformURI string    `json:"waveformURI"`
+	Duration    time.Time `json:"duration"`
+	CreatedAt   time.Time `json:"createdAt"`
 }
 
 func index(ws *websocket.Conn) {
 	for {
-		str, _ := json.Marshal(suprême{"only a test", "asdf", "waveform.png", time.Now(), time.Now()})
-		websocket.Message.Send(ws, str)
+		<-time.After(time.Second * 2)
+		str, _ := json.Marshal(Suprême{"only a test", "asdf", "waveform.png", time.Now(), time.Now()})
+		ws.Write(str)
 		log.Printf("sent: %#v\n", str)
 	}
 }
