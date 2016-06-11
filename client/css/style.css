@@ -13,7 +13,7 @@ body {
     width: 96px;
     height: 96px;
     fill: #fef200;
-    box-shadow: 0 0 0 2px #fff, -32px 0 108px -5px rgba(254,242,0,1);
+    box-shadow: 0 0 0 2px #fff, -8px 0 108px -5px rgba(254,242,0,1);
     border-radius: 50%;
 /*    filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));*/
 }
