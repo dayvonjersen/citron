@@ -2,39 +2,84 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
-
-	"github.com/codykrainock/nanobase" // " A dead-simple flat-file database written in Go. "
 )
 
 func checkErr(err error) {
 	if err != nil {
-		log.Fatalln(err)
+		log.Panicln(err)
 	}
 }
 
+// shoutouts to php
+func fileGetContents(filename string) []byte {
+	f, err := os.Open(filename)
+	checkErr(err)
+
+	info, err := os.Stat(filename)
+	checkErr(err)
+
+	contents := make([]byte, info.Size())
+	_, err = f.Read(contents)
+	f.Close()
+	if err != io.EOF {
+		checkErr(err)
+	}
+	return contents
+}
+
+func filePutContents(filename string, contents []byte) {
+	f, err := os.Open(filename)
+	checkErr(err)
+
+	f.Write(contents)
+	f.Close()
+}
+
+func fileExists(filename string) bool {
+	f, err := os.Open(filename)
+	f.Close()
+	if os.IsNotExist(err) {
+		return false
+	}
+	checkErr(err)
+	return true
+}
+
 type datastore struct {
-	conn *nanobase.Nanobase
+	path string
 }
 
 func (db *datastore) init() {
-	c, err := nanobase.Connect(".db")
+	p, err := filepath.Abs(".db")
 	checkErr(err)
-	db.conn = c
+	db.path = p
 }
 
 func (db *datastore) get(key string) Suprême {
 	var val Suprême
-	checkErr(db.conn.Get(key, &val))
+
+	fileName := fmt.Sprintf("%s%c%s.json", db.path, os.PathSeparator, key)
+	if fileExists(fileName) {
+		checkErr(json.Unmarshal(fileGetContents(fileName), &val))
+	}
 	return val
 }
 
 func (db *datastore) set(key string, val Suprême) {
-	checkErr(db.conn.Put(key, val))
+	contents, err := json.Marshal(val)
+	checkErr(err)
+
+	fileName := fmt.Sprintf("%s%c%s.json", db.path, os.PathSeparator, key)
+	filePutContents(fileName, contents)
 }
 
 // temp?
@@ -57,22 +102,22 @@ func (l lmodSlice) Swap(i, j int) {
 }
 
 func (db *datastore) getRange(start, limit int) []string {
-	dir, err := os.OpenFile(".db", os.O_RDONLY, os.ModeDir)
+	dir, err := os.Open(db.path)
+	log.Println(db.path)
 	checkErr(err)
 	files, err := dir.Readdir(-1)
 	checkErr(err)
 	ls := lmodSlice{}
 	for _, file := range files {
-		log.Println(file.Name())
 		ls = append(ls, lmod{strings.TrimRight(file.Name(), ".json"), file.ModTime()})
 	}
+	dir.Close()
 	sort.Sort(ls)
 	ret := []string{}
 	for i, l := range ls {
 		if i < start {
 			continue
 		}
-		log.Println(l.Name)
 		ret = append(ret, l.Name)
 		if i > limit {
 			break

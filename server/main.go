@@ -128,7 +128,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 var db datastore
 
 func main() {
-	//db.init()
+	db.init()
 	pubsubhubbub = make(chan string)
 	http.HandleFunc("/", index)
 	log.Println("Listening on :12345")
