@@ -53,7 +53,7 @@ func index(ws *websocket.Conn) {
 				ws.Write(str)
 				log.Printf("sent: %s\n", str)
 			default:
-				log.Fatalln(err)
+				log.Println("error:", err)
 			}
 		}
 	}
