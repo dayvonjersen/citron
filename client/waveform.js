@@ -3,14 +3,13 @@ const minPxPerSec = 20;
 const waveColor = "#999";
 const normalize = false;
 
-function drawWaveform(container, audioFile) {
+function processAudioFile(audioFile, doneFn) {
     let reader = new FileReader();
-    reader.onload = (event) => _drawWaveform(container, event.target.result);
+    reader.onload = (event) => _processAudioFile(event.target.result, doneFn);
     reader.readAsArrayBuffer(audioFile);
 }
 
-function _drawWaveform(container, audioData) {
-    let containerElement = document.querySelector(container);
+function _processAudioFile(audioData, doneFn) {
     let audioCtx = new AudioContext();
     let canvasElement = document.createElement('canvas');
     let canvasCtx = canvasElement.getContext('2d');
@@ -20,7 +19,7 @@ function _drawWaveform(container, audioData) {
         canvasElement.width = width;
         let peaks = getPeaks(audioBuffer, width);
         drawPeaks(canvasCtx, peaks, width);
-        containerElement.innerHTML = `<img src="${ canvasElement.toDataURL() }" alt="whoops">`;
+        doneFn(canvasElement.toDataURL(), audioBuffer.duration);
     });
 }
 
