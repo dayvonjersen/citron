@@ -1,6 +1,6 @@
 const pixelRatio = window.devicePixelRatio || screen.deviceXDPI / screen.logicalXDPI;
 const minPxPerSec = 20;
-const waveColor = "#999";
+const waveColor = "#000";
 const normalize = false;
 
 function processAudioFile(audioFile, doneFn) {
@@ -17,6 +17,7 @@ function _processAudioFile(audioData, doneFn) {
     audioCtx.decodeAudioData(audioData, (audioBuffer) => {
         let width = Math.round(audioBuffer.duration * minPxPerSec * pixelRatio);
         canvasElement.width = width;
+        canvasElement.height = 128;
         let peaks = getPeaks(audioBuffer, width);
         drawPeaks(canvasCtx, peaks, width);
         doneFn(canvasElement.toDataURL(), audioBuffer.duration);

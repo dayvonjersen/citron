@@ -20,8 +20,9 @@ echo "/* {{{ */" > tmpcss
 # cat ../../sorbet.css/dist/vars.min.css >> tmpcss
 tail -n +1 $(ls -d *.css | tr '\n' ' ') | sed 's/==>\(.*\)<==/\/* \}\}\}\n \1 \{\{\{ \*\//' | sed 's/\r//g' >> tmpcss
 echo "/* }}} vim:set fdm=marker foldlevel=0: */" >> tmpcss
+mv tmpcss ../dist/webcomponents.css
 # echo "CSS4 with myth to webcomponents.css"
-# myth --no-prefixes tmpcss > ../dist/webcomponents.css
+# myth --no-prefixes tmpcss > 
 # # if [[ $? != 0 ]]; then
 #     echo "myth failed."
 #     echo "aborted"
