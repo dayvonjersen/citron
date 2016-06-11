@@ -39,12 +39,12 @@
                     <div style="flex:auto">
                         <h1>
                             <span class="fileName"></span>
-                            <span class="createdAt" style="font-size:12px;float:right;color:#ccc"></span>
+                            <span class="createdAt" data-value style="font-size:12px;float:right;color:#ccc"></span>
                         </h1>
                         <img class="wave waveformURI">
                     </div>
                 </div>
-                <time class="duration"></time>
+                <time class="duration" data-value></time>
             </article>
         </template>
 
@@ -113,8 +113,10 @@ window.addEventListener("load", () => {
 
         let created = new Date(data.createdAt);
         createdAt.innerHTML = fdate(created);
+        createdAt.dataset.value = data.createdAt;
 
         duration.innerHTML = fduration(data.duration);
+        duration.dataset.value = data.duration;
 
         waveformURI.src = data.waveformURI;
 
@@ -174,10 +176,16 @@ window.addEventListener("load", () => {
 
         Promise.all([processedTheAudioFile, seededTheTorrent]).then(() => {
             console.log("promise.all complete");
-            console.log(JSON.stringify(metadata));
+            //console.log(JSON.stringify(metadata));
             sendPayload(metadata);
         });
     });
+
+    setInterval(() => {
+        [].forEach.call(document.querySelectorAll(".createdAt"), (createdAt) => {
+            createdAt.innerHTML = fdate(new Date(createdAt.dataset.value));
+        });
+    }, 1000);
 
 });
         </script>

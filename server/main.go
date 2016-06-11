@@ -53,7 +53,7 @@ func index(ws *websocket.Conn) {
 				case nil:
 					str, _ := json.Marshal(Suprême{"hello from go!", s.MagnetURI, s.WaveformURI, s.Duration, time.Now()})
 					ws.Write(str)
-					log.Printf("sent: %s\n", str)
+					log.Printf("sent: [stuff]") //%s\n", str)
 				default:
 					log.Println("error:", err)
 				}
