@@ -3,3 +3,4 @@
 client/node_modules
 npm_debug.log
 .scratch/*
+server/.db
