@@ -13,13 +13,20 @@
         <!--
             JS
         -->
-        <script src="dragdrop.min.js"></script>
-        <script src="webtorrent.min.js"></script>
+        <script src="dragdrop.min.js" async></script>
+        <script src="webtorrent.min.js" async></script>
 
         <!--
             MORE JS
         -->
-        <script src="waveform.js"></script>
+        <script src="waveform.js" async></script>
+
+        <!--
+            teh WebComponents rEvoLuTiOn~
+        -->
+        <link rel="stylesheet" href="webcomponents/dist/webcomponents.css">
+        <script src="webcomponents/dist/webcomponents.js" async></script>
+
     </head>
     <body>
         <header>
@@ -41,7 +48,10 @@
                             <span class="fileName"></span>
                             <span class="createdAt" data-value style="font-size:12px;float:right;color:#ccc"></span>
                         </h1>
-                        <img class="wave waveformURI">
+                        
+                        <div style="background-size:100% 100%" class="waveformURI">
+                            <input-range style="height:128px"></input-range>
+                        </div>
                     </div>
                 </div>
                 <time class="duration" data-value></time>
@@ -118,7 +128,8 @@ window.addEventListener("load", () => {
         duration.innerHTML = fduration(data.duration);
         duration.dataset.value = data.duration;
 
-        waveformURI.src = data.waveformURI;
+        waveformURI.style.backgroundImage = "url(" + data.waveformURI + ")";
+        tpl.querySelector('input-range').setAttribute("max", data.duration);
 
         mainElement.appendChild(tpl);
     };
