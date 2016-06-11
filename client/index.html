@@ -116,6 +116,8 @@ window.addEventListener("load", () => {
         return prefix + q() + q() + q() + q();
     };
 
+    let leecherClient = new WebTorrent();                        
+
     let addChild = (data) => {
 
         let tpl = getTemplate("supreme");
@@ -132,7 +134,15 @@ window.addEventListener("load", () => {
         let createdAt = tpl.querySelector('.createdAt');
 
         let playbutton = tpl.querySelector('.play'); 
-//        playbutton.addEventListener("
+        playbutton.addEventListener("click", (function(magnetURI) 
+            {
+                return (evt) => {
+                    leecherClient.add(magnetURI, (torrent) => {
+                        torrent.files[0].appendTo(`#${uuid}`);
+                    });
+                }
+            })(data.magnetURI)
+        );
 
         fileName.innerHTML = data.fileName;
 
@@ -173,7 +183,7 @@ window.addEventListener("load", () => {
 
     });
 
-    let client = new WebTorrent();
+    let seederClient = new WebTorrent();
 
     DragDrop('html', (files) => {
 
@@ -194,8 +204,8 @@ window.addEventListener("load", () => {
         });
 
         let seededTheTorrent = new Promise((resolve, reject) => {
-            client.seed(files, (torrent) => {
-                console.log("client.seed done")
+            seederClient.seed(files, (torrent) => {
+                console.log("seederClient.seed done")
                 metadata.magnetURI = torrent.magnetURI
                 resolve(true);
             });
