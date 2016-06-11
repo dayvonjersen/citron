@@ -97,7 +97,7 @@ function drawPeaks(canvasCtx, peaks, width, splitChannels=false, channelIndex=0)
 
     // A half-pixel offset makes lines crisp
     let $ = 0.5 / pixelRatio;
-    let height = 128 * pixelRatio;
+    let height = 128;
     let offsetY = height * channelIndex || 0;
     let halfH = height / 2;
     let length = ~~(peaks.length / 2);
