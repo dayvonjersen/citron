@@ -28,8 +28,8 @@ func index(ws *websocket.Conn) {
 			select {
 			case <-done:
 				return
-			case <-time.After(time.Second * 2):
-				str, _ := json.Marshal(Suprême{"hello from go!", "asdf", "waveform.png", 3695, time.Now()})
+			case <-time.After(time.Hour * 30):
+				str, _ := json.Marshal(Suprême{"fake", "asdf", "waveform.png", 3695, time.Now()})
 				ws.Write(str)
 				log.Printf("sent: %s\n", str)
 				return
@@ -49,7 +49,9 @@ func index(ws *websocket.Conn) {
 			case io.EOF:
 				close(done)
 			case nil:
-				log.Println("(do work with message here...)")
+				str, _ := json.Marshal(Suprême{"hello from go!", s.MagnetURI, s.WaveformURI, s.Duration, time.Now()})
+				ws.Write(str)
+				log.Printf("sent: %s\n", str)
 			default:
 				log.Fatalln(err)
 			}

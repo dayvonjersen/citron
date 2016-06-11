@@ -139,34 +139,51 @@ window.addEventListener("load", () => {
         mainElement.innerHTML = err.message
     }
 
-    window.addEventListener("WebSocketReady", () => {
+/*    window.addEventListener("WebSocketReady", () => {
         sendPayload({
             fileName: "hello from chrome!",
             magnetURI: "?!:¿",
             waveformURI: "data:text/plain;hi there!!",
             duration: 23456
         });
+    });*/
+
+    let client = new WebTorrent();
+
+    DragDrop('body', (files) => {
+
+        let metadata = {
+            fileName: "",
+            magnetURI: "",
+            waveformURI: "",
+            duration: 0
+        };
+
+        let processedTheAudioFile = new Promise((resolve, reject) => {
+            processAudioFile(files[0], (waveformURI, duration) => {
+                console.log("processAudioFile done");
+                metadata.waveformURI = waveformURI;
+                metadata.duration = duration;
+                resolve(true);
+            });
+        });
+
+        let seededTheTorrent = new Promise((resolve, reject) => {
+            client.seed(files, (torrent) => {
+                console.log("client.seed done")
+                metadata.magnetURI = torrent.magnetURI
+                resolve(true);
+            });
+        });
+
+        Promise.all([processedTheAudioFile, seededTheTorrent]).then(() => {
+            console.log("promise.all complete");
+            console.log(JSON.stringify(metadata));
+            sendPayload(metadata);
+        });
     });
 
 });
-            /*
-            let client = new WebTorrent();
-            DragDrop('#dropzone', (files) => {
-                drawWaveform("#waveform", files[0]);
-                
-
-                client.seed(files, (torrent) => {
-                    let client2 = new WebTorrent();
-                    client2.add(torrent.magnetURI, (torrent) => {
-                        //torrent.files[0].appendTo('body');
-                        torrent.files[0].getBuffer((err, buffer) => {
-                            if(err)  console.error(err);
-
-                            wavesurfer.loadArrayBuffer(buffer);
-                        });
-                    });
-                });
-            });*/
         </script>
     </body>
 </html>
