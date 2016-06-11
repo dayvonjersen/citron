@@ -44,3 +44,12 @@ header {
 article {
     margin: 64px 0;
 }
+input, textarea {
+    display: block;
+    width: 100%;
+    border: 1px inset;
+    padding: .5em 1em;
+    box-sizing: border-box;
+    margin-bottom: 1em;
+    resize: none;
+}
