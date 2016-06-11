@@ -23,12 +23,11 @@ func index(ws *websocket.Conn) {
 	done := make(chan struct{})
 
 	go func() {
-
 		for {
 			select {
 			case <-done:
 				return
-			case <-time.After(time.Hour * 30):
+			case <-time.After(time.Second):
 				str, _ := json.Marshal(Suprême{"fake", "asdf", "waveform.png", 3695, time.Now()})
 				ws.Write(str)
 				log.Printf("sent: %s\n", str)
@@ -62,6 +61,7 @@ func index(ws *websocket.Conn) {
 			}
 		}
 	}()
+
 	<-done
 }
 

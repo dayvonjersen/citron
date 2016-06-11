@@ -49,9 +49,7 @@
                             <span class="createdAt" data-value style="font-size:12px;float:right;color:#ccc"></span>
                         </h1>
                         
-                        <div style="background-size:100% 100%" class="waveformURI">
-                            <input-range style="height:128px"></input-range>
-                        </div>
+                        <div style="background-size:100% 100%" class="waveformURI"></div>
                     </div>
                 </div>
                 <time class="duration" data-value></time>
@@ -129,9 +127,10 @@ window.addEventListener("load", () => {
         duration.dataset.value = data.duration;
 
         waveformURI.style.backgroundImage = "url(" + data.waveformURI + ")";
-        tpl.querySelector('input-range').setAttribute("max", data.duration);
 
         mainElement.appendChild(tpl);
+
+        mainElement.querySelector('.waveformURI').innerHTML = `<input-range style="height:128px" max="${data.duration}"></input-range>`;
     };
 
     /**
