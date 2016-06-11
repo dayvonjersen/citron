@@ -4,7 +4,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -17,31 +17,6 @@ func checkErr(err error) {
 	if err != nil {
 		log.Panicln(err)
 	}
-}
-
-// shoutouts to php
-func fileGetContents(filename string) []byte {
-	f, err := os.Open(filename)
-	checkErr(err)
-
-	info, err := os.Stat(filename)
-	checkErr(err)
-
-	contents := make([]byte, info.Size())
-	_, err = f.Read(contents)
-	f.Close()
-	if err != io.EOF {
-		checkErr(err)
-	}
-	return contents
-}
-
-func filePutContents(filename string, contents []byte) {
-	f, err := os.Open(filename)
-	checkErr(err)
-
-	f.Write(contents)
-	f.Close()
 }
 
 func fileExists(filename string) bool {
@@ -69,7 +44,9 @@ func (db *datastore) get(key string) Suprême {
 
 	fileName := fmt.Sprintf("%s%c%s.json", db.path, os.PathSeparator, key)
 	if fileExists(fileName) {
-		checkErr(json.Unmarshal(fileGetContents(fileName), &val))
+		contents, err := ioutil.ReadFile(fileName)
+		checkErr(err)
+		checkErr(json.Unmarshal(contents, &val))
 	}
 	return val
 }
@@ -79,7 +56,7 @@ func (db *datastore) set(key string, val Suprême) {
 	checkErr(err)
 
 	fileName := fmt.Sprintf("%s%c%s.json", db.path, os.PathSeparator, key)
-	filePutContents(fileName, contents)
+	ioutil.WriteFile(fileName, contents, 0666)
 }
 
 // temp?
@@ -103,7 +80,6 @@ func (l lmodSlice) Swap(i, j int) {
 
 func (db *datastore) getRange(start, limit int) []string {
 	dir, err := os.Open(db.path)
-	log.Println(db.path)
 	checkErr(err)
 	files, err := dir.Readdir(-1)
 	checkErr(err)
