@@ -27,10 +27,16 @@
         <link rel="stylesheet" href="webcomponents/dist/webcomponents.css">
         <script src="webcomponents/dist/webcomponents.js" async></script>
 
+        <!--
+            Avgrund!
+        -->
+        <link rel="stylesheet" href="avgrund.css">
+        <script src="avgrund.js" async></script>
+
     </head>
     <body>
         <header>
-            <img src="upload.svg" style="display:inline;width:32px;height:32px;float:right;margin-top:16px;">
+            <img onclick="testModal()" src="upload.svg" style="display:inline;width:32px;height:32px;float:right;margin-top:16px;">
         </header>
 
         <main>Loading...</main>
@@ -57,10 +63,36 @@
             </article>
         </template>
 
+        <template id="modal">
+            <aside class="avgrund-popup">
+                <h2>an title</h2>
+                <p>an lorem</p>
+            </aside>
+        </template>
+
+        <div class="avgrund-cover"></div>
+
         <script>
+window.testModal = ()=>{}
 window.addEventListener("load", () => {
 
     let getTemplate = (id) => document.getElementById(id).content.cloneNode(true);
+
+    let uniqid = function(prefix) {
+        prefix = typeof(prefix) === "undefined" ? "uniqid-" : prefix.toString();
+        function q() {
+            return parseInt(Math.pow(2,32) * Math.random(),10).toString(16);
+        }
+        return prefix + q() + q() + q() + q();
+    };
+
+    window.testModal = () => {
+        let tpl = getTemplate("modal");
+        let uuid = uniqid();
+        tpl.firstElementChild.setAttribute("id", uuid)
+        document.body.appendChild(tpl);
+        Avgrund.show(`#${uuid}`);
+    };
 
     let mainElement = document.querySelector("main");
 
@@ -106,14 +138,6 @@ window.addEventListener("load", () => {
         let m = parseInt(s / 60, 10);
         s %= 60;
         return `${h > 0 ? zeroPad(h)+':' : ''}${zeroPad(m)}:${zeroPad(s)}`;
-    };
-
-    let uniqid = function(prefix) {
-        prefix = typeof(prefix) === "undefined" ? "sorbet-uniqid-" : prefix.toString();
-        function q() {
-            return parseInt(Math.pow(2,32) * Math.random(),10).toString(16);
-        }
-        return prefix + q() + q() + q() + q();
     };
 
     let leecherClient = new WebTorrent();                        
