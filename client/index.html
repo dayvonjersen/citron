@@ -39,9 +39,10 @@
             <article style="position:relative">
                 <div style="display:flex;flex-wrap:nowrap;align-items:center">
                     <div style="flex:0 1 auto;margin-right:16px;">
-                        <svg version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="play">
-                            <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M45,72.4H33V27.2h12V72.4z M67,72.4H55 V27.2h12V72.4z"/>
-                        </svg>
+<svg version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" class="play">
+  <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M38.7,72.4V27.2l34.9,22.6L38.7,72.4z"/>
+</svg>
+                        
                     </div>
                     <div style="flex:auto">
                         <h1>
@@ -105,17 +106,33 @@ window.addEventListener("load", () => {
         let m = parseInt(s / 60, 10);
         s %= 60;
         return `${h > 0 ? zeroPad(h)+':' : ''}${zeroPad(m)}:${zeroPad(s)}`;
-    };        
+    };
+
+    let uniqid = function(prefix) {
+        prefix = typeof(prefix) === "undefined" ? "sorbet-uniqid-" : prefix.toString();
+        function q() {
+            return parseInt(Math.pow(2,32) * Math.random(),10).toString(16);
+        }
+        return prefix + q() + q() + q() + q();
+    };
 
     let addChild = (data) => {
 
         let tpl = getTemplate("supreme");
+
+        let uuid = uniqid();
+
+        let articleElement = tpl.querySelector('article');
+        articleElement.setAttribute("id", uuid);
 
         let fileName = tpl.querySelector('.fileName');
         //let magnetURI = tpl.querySelector('.magnetURI');
         let waveformURI = tpl.querySelector('.waveformURI');
         let duration = tpl.querySelector('.duration');
         let createdAt = tpl.querySelector('.createdAt');
+
+        let playbutton = tpl.querySelector('.play'); 
+//        playbutton.addEventListener("
 
         fileName.innerHTML = data.fileName;
 
@@ -129,8 +146,8 @@ window.addEventListener("load", () => {
         waveformURI.style.backgroundImage = "url(" + data.waveformURI + ")";
 
         mainElement.appendChild(tpl);
-
-        mainElement.querySelector('.waveformURI').innerHTML = `<input-range style="height:128px" max="${data.duration}"></input-range>`;
+        
+        mainElement.querySelector(`#${uuid} .waveformURI`).innerHTML = `<input-range style="height:128px" max="${data.duration}"></input-range>`;
     };
 
     /**
