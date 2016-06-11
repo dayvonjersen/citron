@@ -43,6 +43,14 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
+	tmp := db.getRange(0, 5)
+	db.init()
+	for _, uri := range tmp {
+		s := db.get(uri)
+		c.WriteJSON(s)
+		log.Println("sent:", uri)
+	}
+
 	esc := make(chan struct{})
 	go func() {
 		for {
@@ -58,14 +66,14 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	go func() {
+	here:
 		for {
 			var s Suprême
 			err := c.ReadJSON(&s)
 			switch err {
 			case io.EOF:
 				log.Println("reader shutting down")
-				close(pubsubhubbub)
-				return
+				break here
 			case nil:
 
 				// validate structure ...
@@ -80,6 +88,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 			default:
 				log.Println("error:", err)
+				break here
 			}
 		}
 	}()
@@ -90,7 +99,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 var db datastore
 
 func main() {
-	db.init()
+	//db.init()
 	pubsubhubbub = make(chan string)
 	http.HandleFunc("/", index)
 	log.Println("Listening on :12345")
