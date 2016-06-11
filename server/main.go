@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -18,19 +19,41 @@ type Suprême struct {
 }
 
 func index(ws *websocket.Conn) {
+
+	done := make(chan struct{})
+
 	go func() {
+
 		for {
-			var s Suprême
-			err := websocket.JSON.Receive(ws, &s)
-			log.Printf("got: %#v, %v\n", s, err)
+			select {
+			case <-done:
+				return
+			case <-time.After(time.Second * 2):
+				str, _ := json.Marshal(Suprême{"hello from go!", "asdf", "waveform.png", 3695, time.Now()})
+				ws.Write(str)
+				log.Printf("sent: %s\n", str)
+				return
+			}
 		}
 	}()
 
 	for {
-		<-time.After(time.Second * 2)
-		str, _ := json.Marshal(Suprême{"only a test", "asdf", "waveform.png", 3695, time.Now()})
-		ws.Write(str)
-		log.Printf("sent: %s\n", str)
+		select {
+		case <-done:
+			return
+		default:
+			var s Suprême
+			err := websocket.JSON.Receive(ws, &s)
+			log.Printf("got: %#v, %v\n", s, err)
+			switch err {
+			case io.EOF:
+				close(done)
+			case nil:
+				log.Println("(do work with message here...)")
+			default:
+				log.Fatalln(err)
+			}
+		}
 	}
 }
 

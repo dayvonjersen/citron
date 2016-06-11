@@ -127,12 +127,26 @@ window.addEventListener("load", () => {
      */
     mainElement.innerHTML = "";
 
+    let sendPayload;
     try {
         let ws = new WebSocket("ws://" + location.host + ":12345/");
         ws.onmessage = (evt) => addChild(JSON.parse(evt.data));
+        ws.onopen = () => {
+            sendPayload = (data) => ws.send(JSON.stringify(data));
+            window.dispatchEvent(new Event("WebSocketReady"));
+        };
     } catch(err) {
         mainElement.innerHTML = err.message
     }
+
+    window.addEventListener("WebSocketReady", () => {
+        sendPayload({
+            fileName: "hello from chrome!",
+            magnetURI: "?!:¿",
+            waveformURI: "data:text/plain;hi there!!",
+            duration: 23456
+        });
+    });
 
 });
             /*
