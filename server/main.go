@@ -37,23 +37,26 @@ func index(ws *websocket.Conn) {
 		}
 	}()
 
+	dec := json.NewDecoder(ws)
 	for {
 		select {
 		case <-done:
 			return
 		default:
-			var s Suprême
-			err := websocket.JSON.Receive(ws, &s)
-			log.Printf("got: %#v, %v\n", s, err)
-			switch err {
-			case io.EOF:
-				close(done)
-			case nil:
-				str, _ := json.Marshal(Suprême{"hello from go!", s.MagnetURI, s.WaveformURI, s.Duration, time.Now()})
-				ws.Write(str)
-				log.Printf("sent: %s\n", str)
-			default:
-				log.Println("error:", err)
+			if dec.More() {
+				var s Suprême
+				err := dec.Decode(&s)
+				log.Printf("got: %#v, %v\n", s, err)
+				switch err {
+				case io.EOF:
+					close(done)
+				case nil:
+					str, _ := json.Marshal(Suprême{"hello from go!", s.MagnetURI, s.WaveformURI, s.Duration, time.Now()})
+					ws.Write(str)
+					log.Printf("sent: %s\n", str)
+				default:
+					log.Println("error:", err)
+				}
 			}
 		}
 	}
