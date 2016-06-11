@@ -1,10 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"strings"
+	"net/url"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -18,9 +19,31 @@ type Suprême struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
-func getURI(magnet string) string {
-	// what could go wrong?
-	return strings.Split(strings.TrimLeft(magnet, "magnet:?xt=urn:btih:"), "&")[0]
+func getFileHash(magnet string) (string, error) {
+	u, err := url.Parse(magnet)
+	if err != nil {
+		return "", err
+	}
+	if u.Scheme != "magnet" {
+		return "", fmt.Errorf("invalid magnet: url of is of scheme %s", u.Scheme)
+	}
+
+	q := u.Query()
+
+	xt, ok := q["xt"]
+	if !ok {
+		return "", fmt.Errorf("invalid magnet: missing \"xt\" parameter")
+	}
+	if len(xt) != 1 {
+		return "", fmt.Errorf("invalid magnet: invalid \"xt\" parameter")
+	}
+
+	urn := xt[0]
+	if urn[0:9] != "urn:btih:" {
+		return "", fmt.Errorf("invalid magnet: invalid urn")
+	}
+
+	return urn[9:], nil
 }
 
 var pubsubhubbub chan string
@@ -45,19 +68,19 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 	tmp := db.getRange(0, 5)
 	db.init()
-	for _, uri := range tmp {
-		s := db.get(uri)
+	for _, hash := range tmp {
+		s := db.get(hash)
 		c.WriteJSON(s)
-		log.Println("sent:", uri)
+		log.Println("sent:", hash)
 	}
 
 	esc := make(chan struct{})
 	go func() {
 		for {
-			if uri, ok := <-pubsubhubbub; ok {
-				s := db.get(uri)
+			if hash, ok := <-pubsubhubbub; ok {
+				s := db.get(hash)
 				c.WriteJSON(s)
-				log.Println("sent:", uri)
+				log.Println("sent:", hash)
 			} else {
 				log.Println("writer shutting down")
 				close(esc)
@@ -78,13 +101,19 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 				// validate structure ...
 
-				uri := getURI(s.MagnetURI)
-				s.CreatedAt = time.Now()
+				hash, err := getFileHash(s.MagnetURI)
+				if err != nil {
+					// send error message
+					log.Println("error:", err)
+				} else {
 
-				log.Println("got:", uri)
+					s.CreatedAt = time.Now()
 
-				db.set(uri, s)
-				pubsubhubbub <- uri
+					log.Println("got:", hash)
+
+					db.set(hash, s)
+					pubsubhubbub <- hash
+				}
 
 			default:
 				log.Println("error:", err)
