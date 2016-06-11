@@ -1,13 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"time"
 
-	"golang.org/x/net/websocket"
+	"github.com/gorilla/websocket"
 )
 
 type Suprême struct {
@@ -18,55 +17,37 @@ type Suprême struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
-func index(ws *websocket.Conn) {
+var upgrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	}}
 
-	done := make(chan struct{})
+func index(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("upgrade:", err)
+		return
+	}
+	defer c.Close()
 
-	go func() {
-		for {
-			select {
-			case <-done:
-				return
-			case <-time.After(time.Second):
-				str, _ := json.Marshal(Suprême{"fake", "asdf", "waveform.png", 3695, time.Now()})
-				ws.Write(str)
-				log.Printf("sent: %s\n", str)
-				return
-			}
+	for {
+		var s Suprême
+		err := c.ReadJSON(&s)
+		log.Printf("got: %v, %v\n", s, err)
+		switch err {
+		case io.EOF:
+			break
+		case nil:
+			c.WriteJSON(Suprême{"hello from go!", s.MagnetURI, s.WaveformURI, s.Duration, time.Now()})
+			log.Printf("sent: [stuff]")
+		default:
+			log.Println("error:", err)
 		}
-	}()
-
-	go func() {
-		dec := json.NewDecoder(ws)
-		for {
-			select {
-			case <-done:
-				return
-			default:
-				if dec.More() {
-					var s Suprême
-					err := dec.Decode(&s)
-					log.Printf("got: %#v, %v\n", s, err)
-					switch err {
-					case io.EOF:
-						close(done)
-					case nil:
-						str, _ := json.Marshal(Suprême{"hello from go!", s.MagnetURI, s.WaveformURI, s.Duration, time.Now()})
-						ws.Write(str)
-						log.Printf("sent: [stuff]") //%s\n", str)
-					default:
-						log.Println("error:", err)
-					}
-				}
-			}
-		}
-	}()
-
-	<-done
+	}
 }
 
 func main() {
-	http.Handle("/", websocket.Handler(index))
+	http.HandleFunc("/", index)
 	log.Println("Listening on :12345")
 	log.Panicln(http.ListenAndServe(":12345", nil))
 }
