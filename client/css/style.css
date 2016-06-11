@@ -53,3 +53,11 @@ input, textarea {
     margin-bottom: 1em;
     resize: none;
 }
+
+.not-playing {
+    filter:invert(1);
+    -webkit-filter:invert(1);
+}
+.playing {
+    background:#1e181a;
+}

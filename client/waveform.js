@@ -1,6 +1,6 @@
 const pixelRatio = window.devicePixelRatio || screen.deviceXDPI / screen.logicalXDPI;
 const minPxPerSec = 20;
-const waveColor = "#000";
+const waveColor = "#fefbf6";
 const normalize = false;
 
 function processAudioFile(audioFile, doneFn) {
