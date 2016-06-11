@@ -33,14 +33,20 @@
         <link rel="stylesheet" href="avgrund.css">
         <script src="avgrund.js" async></script>
 
+        <!--
+            codrops!
+        -->
+        <link rel="stylesheet" href="css/cbutton.css">
+
     </head>
     <body>
         <header>
-            <img onclick="aboutModal()" src="lemon.svg" style="display:inline;width:107px;height:78px;float:left;margin-top:3px;
-    filter:drop-shadow(0 0 4px rgba(254,242,0,1));
-    -webkit-filter:drop-shadow(0 0 4px rgba(254,242,0,1));
-            ">
-            <img onclick="testModal()" src="upload.svg" style="display:inline;width:32px;height:32px;float:right;margin-top:16px;">
+            <div onclick="aboutModal()" class="cbutton cbutton--effect-sanja" style="float:left;margin-top:3px;">
+                <img src="lemon.svg" style="width:108.6666666666667px;height:78px;filter:drop-shadow(0 0 4px rgba(254,242,0,1));-webkit-filter:drop-shadow(0 0 4px rgba(254,242,0,1));">
+            </div>
+            <div onclick="testModal()" class="cbutton cbutton--effect-sanja" style="float:right;margin-top:16px;">
+                <img src="upload.svg" style="width:32px;height:32px;">
+            </div>
         </header>
 
         <main>Loading...</main>

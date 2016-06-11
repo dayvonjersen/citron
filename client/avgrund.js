@@ -23,7 +23,7 @@ var Avgrund = (function(){
 
 	// Deactivate on click outside
 	function onDocumentClick( event ) {
-		if( event.target === cover ) {
+		if( event.target === cover || event.target === document.documentElement ) {
 			deactivate();
 		}
 	}

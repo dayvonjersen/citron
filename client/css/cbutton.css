@@ -1,0 +1,76 @@
+.cbutton {
+	position: relative;
+	display: inline-block;
+	padding: 0;
+	border: none;
+	background: none;
+	overflow: visible;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.cbutton.cbutton--click,
+.cbutton:active,
+.cbutton:focus {
+	outline: none;
+}
+
+.cbutton::after {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -35px 0 0 -35px;
+	width: 70px;
+	height: 70px;
+	border-radius: 50%;
+	content: '';
+	opacity: 0;
+	pointer-events: none;
+}
+
+/* Sanja */
+.cbutton--effect-sanja::after {
+	background: rgba(1,112,194,0.1);
+}
+
+.cbutton--effect-sanja.cbutton--click::after,
+.cbutton--effect-sanja:active::after,
+.cbutton--effect-sanja:focus::after {
+	-webkit-animation: anim-effect-sanja 1s ease-out forwards;
+	animation: anim-effect-sanja 1s ease-out forwards;
+}
+
+@-webkit-keyframes anim-effect-sanja {
+	0% {
+		opacity: 1;
+		-webkit-transform: scale3d(0.5, 0.5, 1);
+		transform: scale3d(0.5, 0.5, 1);
+	}
+	25% {
+		opacity: 1;
+		-webkit-transform: scale3d(1, 1, 1);
+		transform: scale3d(1, 1, 1);
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: scale3d(1, 1, 1);
+		transform: scale3d(1, 1, 1);
+	}
+}
+
+@keyframes anim-effect-sanja {
+	0% {
+		opacity: 1;
+		-webkit-transform: scale3d(0.5, 0.5, 1);
+		transform: scale3d(0.5, 0.5, 1);
+	}
+	25% {
+		opacity: 1;
+		-webkit-transform: scale3d(1, 1, 1);
+		transform: scale3d(1, 1, 1);
+	}
+	100% {
+		opacity: 0;
+		-webkit-transform: scale3d(1, 1, 1);
+		transform: scale3d(1, 1, 1);
+	}
+}
