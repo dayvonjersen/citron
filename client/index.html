@@ -167,23 +167,21 @@ window.addEventListener("load", () => {
     let fdate = (date) => {
         let diff = ( (new Date()).getTime() - date.getTime() ) / 1000;
 
-        let amt, unit;
+        let unit = 'second';
 
         switch(true) {
         case (diff < 15):
             return 'just now!';
-        case (diff > 31536000): amt = 31536000; unit = 'year'; break;
-        case (diff > 2592000): amt = 2592000; unit = 'month'; break;
-        case (diff > 604800): amt = 604800; unit = 'week'; break;
-        case (diff > 86400): amt = 86400; unit = 'day'; break;
-        case (diff > 3600): amt = 3600; unit = 'hour'; break;
-        case (diff > 60): amt = 60; unit = 'minute'; break;
-        case (diff > 1): unit = 'second'; break;
-        default: throw new Error(diff);
+        case (diff > 31536000): diff /= 31536000; unit = 'year'; break;
+        case (diff > 2592000): diff /= 2592000; unit = 'month'; break;
+        case (diff > 604800): diff /= 604800; unit = 'week'; break;
+        case (diff > 86400): diff /= 86400; unit = 'day'; break;
+        case (diff > 3600): diff /= 3600; unit = 'hour'; break;
+        case (diff > 60): diff /= 60; unit = 'minute'; break;
         }
 
-        let d = parseInt(diff / amt, 10);
-        return `${d} ${unit}${d == 1 ? '' : 's'} ago`;
+        diff |= 0;
+        return `${diff} ${unit}${diff == 1 ? '' : 's'} ago`;
     };
 
     // maybe I should import a library for this instead ...
