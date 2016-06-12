@@ -44,6 +44,8 @@
             <div onclick="aboutModal()" class="cbutton cbutton--effect-sanja" style="float:left;margin-top:3px;">
                 <img src="lemon.svg" style="width:108.6666666666667px;height:78px;filter:drop-shadow(0 0 4px rgba(254,242,0,1));-webkit-filter:drop-shadow(0 0 4px rgba(254,242,0,1));">
             </div>
+
+
             <div onclick="testModal()" class="cbutton cbutton--effect-sanja" style="float:right;margin-top:16px;">
                    
                 <svg version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg"
@@ -53,6 +55,7 @@
   </g>
 </svg>
             </div>
+            <p id="errorMessage"></p>
         </header>
 
         <main class="avgrund-contents">Loading...</main>
@@ -134,6 +137,17 @@ window.addEventListener("load", () => {
         document.body.appendChild(tpl);
         Avgrund.show(`#${uuid}`);
     };
+
+    let errorMessage = (msg) => {
+        document.getElementById("errorMessage").innerHTML = msg;
+    };
+
+    errorMessage("Something happened.");
+
+    document.getElementById("errorMessage").addEventListener("click", ()=> {
+        document.getElementById("errorMessage").innerHTML = "";
+    });
+
 
     let mainElement = document.querySelector("main");
 

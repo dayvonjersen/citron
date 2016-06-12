@@ -3,10 +3,12 @@ html, body {
     background: #fefbf6;
     color: #1e181a;
     height: 100%;
+    margin: 0;
 }
 body {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 body > main {
     flex: 1;
@@ -47,8 +49,9 @@ time {
     padding: 2px 4px;
 }
 
-header {
+body > header {
     height: 64px;
+    text-align: center;
 }
 
 article {
@@ -80,4 +83,9 @@ footer {
 footer hr {
     border: 1px rgba(30, 24, 26, 0.25) solid;
     margin-bottom: 1em;
+}
+
+#errorMessage {
+    color: #ed1b24;
+    line-height: 64px;
 }
