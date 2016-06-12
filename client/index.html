@@ -313,12 +313,11 @@ window.addEventListener("load", () => {
 
     setInterval( () => {
         let substr = "";
-            let prevCp = document.title.codePointAt(0);
-            let prevCc = document.title.charCodeAt(0);
+        let prevCp = document.title.codePointAt(0);
+        let prevCc = document.title.charCodeAt(0);
         for(let c = 1; c < document.title.length; c++) {
             let cp = document.title.codePointAt(c);
             let cc = document.title.charCodeAt(c);
-
             if( cp < 65535 && cp === cc ) {
                 if( prevCp === prevCc){
                     substr += String.fromCodePoint(cp);
