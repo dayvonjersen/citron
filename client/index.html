@@ -95,6 +95,9 @@
             </article>
         </template>
 
+        <!--
+            share
+        -->
         <template id="share">
             <aside class="avgrund-popup">
                 <input required placeholder="DJ Unknown - &quot;untitled (unReleased Mix)&quot;" name="fileName">
@@ -106,7 +109,10 @@
                 </div>
             </aside>
         </template>
-        
+
+        <!--
+            about
+        -->
         <template id="about">
             <aside class="avgrund-popup">
                 <h1>citrus.audio</h1>
@@ -114,18 +120,20 @@
             </aside>
         </template>
 
+        <!--
+            needed for Avgrund
+        -->
         <div class="avgrund-cover"></div>
 
         <script>
-window.testModal = ()=>{}
-window.aboutModal = ()=>{}
+// dummies
+window.testModal = () => {}
+window.aboutModal = () => {}
+
+// int main(void) {
 window.addEventListener("load", () => {
-
-    let getTemplate = (id) => document.getElementById(id).content.cloneNode(true);
-
-    let q = () => parseInt(Math.pow(2,32)*Math.random(),10).toString(16);
-    let uniqid = () => `uniqid-${q()+q()+q()+q()}`;
-
+    
+    // xxx
     window.testModal = () => {
         if(!document.getElementById("shareModal")) {
             let tpl = getTemplate("share");
@@ -133,8 +141,7 @@ window.addEventListener("load", () => {
             document.body.appendChild(tpl);
         }
         Avgrund.show("#shareModal");
-    };
-    
+    };    
     window.aboutModal = () => {
         if(!document.getElementById("aboutModal")) {
             let tpl = getTemplate("about");
@@ -143,97 +150,103 @@ window.addEventListener("load", () => {
         }
         Avgrund.show("#aboutModal");
     };
+    //xxx
 
-    let errorMessage = (msg) => {
-        document.getElementById("errorMessage").innerHTML = msg;
-    };
+    //
+    // utility functions
+    //
 
-    errorMessage("Something happened.");
+    // stamps out a <template>
+    let getTemplate = (id) => document.getElementById(id).content.cloneNode(true);
 
-    document.getElementById("errorMessage").addEventListener("click", ()=> {
-        document.getElementById("errorMessage").innerHTML = "";
-    });
+    // unique ids for things
+    let q = () => parseInt(Math.pow(2,32)*Math.random(),10).toString(16);
+    let uniqid = () => `uniqid-${q()+q()+q()+q()}`;
 
-
-    let mainElement = document.querySelector("main");
-
-    let ftime = (time, amount, unit) => {
-        if(time >= amount) {
-            let d = parseInt(time/amount, 10);
-            return [`${d} ${unit}${d == 1 ? '' : 's'}`, parseInt(time%amount, 10)];
-        } else {
-            return ['', time];
-        }
-    };
-
+    // format date, e.g. "1 hour ago"
     let fdate = (date) => {
         let diff = ( (new Date()).getTime() - date.getTime() ) / 1000;
-        if(diff < 1) {
+
+        let amt, unit;
+
+        switch(true) {
+        case (diff < 15):
             return 'just now!';
+        case (diff > 31536000): amt = 31536000; unit = 'year'; break;
+        case (diff > 2592000): amt = 2592000; unit = 'month'; break;
+        case (diff > 604800): amt = 604800; unit = 'week'; break;
+        case (diff > 86400): amt = 86400; unit = 'day'; break;
+        case (diff > 3600): amt = 3600; unit = 'hour'; break;
+        case (diff > 60): amt = 60; unit = 'minute'; break;
+        case (diff > 1): unit = 'second'; break;
+        default: throw new Error(diff);
         }
 
-        let ret = [];
-        var tmp = ftime(diff, 31536000, 'year');
-        ret[ret.length] = tmp[0]; diff = tmp[1];
-        tmp = ftime(diff, 2592000, 'month');
-        ret[ret.length] = tmp[0]; diff = tmp[1];
-        tmp = ftime(diff, 604800, 'week');
-        ret[ret.length] = tmp[0]; diff = tmp[1];
-        tmp = ftime(diff, 86400, 'day');
-        ret[ret.length] = tmp[0]; diff = tmp[1];
-        tmp = ftime(diff, 3600, 'hour');
-        ret[ret.length] = tmp[0]; diff = tmp[1];
-        tmp = ftime(diff, 60, 'minute');
-        ret[ret.length] = tmp[0]; diff = tmp[1];
-        tmp = ftime(diff, 1, 'second');
-        ret[ret.length] = tmp[0]; 
-
-        return ret.filter((s)=>s).shift() + " ago";
+        let d = parseInt(diff / amt, 10);
+        return `${d} ${unit}${d == 1 ? '' : 's'} ago`;
     };
 
+    // maybe I should import a library for this instead ...
     let zeroPad = (x) => `${x < 10 ? '0' : ''}${x}`;
 
+    // format duration, e.g. "01m:25s"
     let fduration = (s) => {
         let h = parseInt(s / 3600, 10);
         s %= 3600;
         let m = parseInt(s / 60, 10);
         s %= 60;
-        return `${h > 0 ? zeroPad(h)+':' : ''}${zeroPad(m)}:${zeroPad(s)}`;
+        return `${h > 0 ? zeroPad(h)+'h:' : ''}${zeroPad(m)}m:${zeroPad(s)}s`;
     };
 
-    let leecherClient = new WebTorrent();                        
+    // the penguin of doom
+    let rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
+    //
+    // they might be webcomponents
+    //
+
+    // shows red text at the top of page
+    let errorMessageElement = document.getElementById("errorMessage");
+    let errorMessage = (msg) => {
+        console.error(msg);
+        errorMessageElement.innerHTML = msg;
+    };
+    errorMessageElement.addEventListener("click", () => {
+        errorMessageElement.innerHTML = "";
+    });
+
+    // attaches new segments 
+    //xxx: needs some love
+    let mainElement = document.querySelector("main");
+    let leecherClient = new WebTorrent();                        
     let addChild = (data) => {
 
         let tpl = getTemplate("suprême");
-
-        let uuid = uniqid();
-
+        
         let articleElement = tpl.querySelector('article');
-        articleElement.setAttribute("id", uuid);
-
         let fileName = tpl.querySelector('.fileName');
         //let magnetURI = tpl.querySelector('.magnetURI');
         let waveformURI = tpl.querySelector('.waveformURI');
         let duration = tpl.querySelector('.duration');
         let createdAt = tpl.querySelector('.createdAt');
-
         let playbutton = tpl.querySelector('.play'); 
-/*        playbutton.addEventListener("click", (function(magnetURI) 
-            {
-                return (evt) => {
-                    leecherClient.add(magnetURI, (torrent) => {
-                        torrent.files[0].appendTo(`#${uuid}`);
-                    });
-                }
-            })(data.magnetURI)
-            );*/
         let waveformBox = tpl.querySelector('.waveformBox');
+        
+        let uuid = uniqid();
+        articleElement.setAttribute("id", uuid);
+
+        playbutton.addEventListener("click", (function(magnetURI){
+            return (evt) => {
+                leecherClient.add(magnetURI, (torrent) => {
+                    torrent.files[0].appendTo(`#${uuid}`);
+                });
+            };
+        })(data.magnetURI) );
+
         playbutton.addEventListener("click", () => {
             waveformBox.classList.toggle('not-playing');
             waveformBox.classList.toggle('playing');
         });
-            
 
         fileName.innerHTML = data.fileName;
 
@@ -251,12 +264,18 @@ window.addEventListener("load", () => {
         mainElement.querySelector(`#${uuid} .waveformURI`).innerHTML = `<input-range style="height:128px" max="${data.duration}"></input-range>`;
     };
 
-    /**
-     * init 
-     */
+    //
+    // websocket
+    //
+
     mainElement.innerHTML = "Opening websocket...";
+    window.addEventListener("WebSocketReady", () => mainElement.innerHTML = "");
 
     let sendPayload;
+    let wsError = () => {
+        errorMessage("Couldn't connect to websocket.");
+        mainElement.innerHTML = "x_x";
+    };
     try {
         let ws = new WebSocket("ws://" + location.host + ":12345/");
         ws.onopen = () => {
@@ -264,18 +283,17 @@ window.addEventListener("load", () => {
             window.dispatchEvent(new Event("WebSocketReady"));
         };
         ws.onmessage = (evt) => addChild(JSON.parse(evt.data));
+        ws.onerror = (evt) => wsError()
     } catch(err) {
-        mainElement.innerHTML = err.message
+        console.error(err.message);
+        wsError();
     }
 
-    window.addEventListener("WebSocketReady", () => {
-
-        mainElement.innerHTML = "";
-
-    });
+    //
+    // magic
+    //
 
     let seederClient = new WebTorrent();
-
     DragDrop('html', (files) => {
 
         let metadata = {
@@ -302,6 +320,8 @@ window.addEventListener("load", () => {
             });
         });
 
+        //xxx
+
         Promise.all([processedTheAudioFile, seededTheTorrent]).then(() => {
             console.log("promise.all complete");
             //console.log(JSON.stringify(metadata));
@@ -309,34 +329,35 @@ window.addEventListener("load", () => {
         });
     });
 
+    //
+    // gimmicks
+    //
+
+    // keeps timestamps up-to-date, e.g. "5 minutes ago" actually being true
     setInterval(() => {
-        [].forEach.call(document.querySelectorAll(".createdAt"), (createdAt) => {
-            createdAt.innerHTML = fdate(new Date(createdAt.dataset.value));
-        });
+        [].forEach.call(
+            document.querySelectorAll(".createdAt"), 
+            (el) => el.innerHTML = fdate(new Date(el.dataset.value))
+        )
     }, 1000);
 
-    let rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
-
+    // 10 years ago was 20 years ago
     setInterval( () => {
+        let title = document.title;
         let substr = "";
-        let prevCp = document.title.codePointAt(0);
-        let prevCc = document.title.charCodeAt(0);
-        for(let c = 1; c < document.title.length; c++) {
-            let cp = document.title.codePointAt(c);
-            let cc = document.title.charCodeAt(c);
-            if( cp < 65535 && cp === cc ) {
-                if( prevCp === prevCc){
-                    substr += String.fromCodePoint(cp);
-                }
-            } else if(cp > 65535) {
+        let prevCp = title.codePointAt(0);
+        let prevCc = title.charCodeAt(0);
+        for(let c = 1; c < title.length; c++) {
+            let cp = title.codePointAt(c);
+            let cc = title.charCodeAt(c);
+            if( cp >= 65535 || (cp < 65535 && cp === cc && prevCp === prevCc) ){
                 substr += String.fromCodePoint(cp);
             }
             prevCp = cp;
             prevCc = cc;
         }
-        document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(document.title.codePointAt(0))));
-    }, 250);    
-
+        document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(title.codePointAt(0))));
+    }, 250);
 });
         </script>
     </body>

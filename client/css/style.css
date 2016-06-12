@@ -141,6 +141,7 @@ input, textarea {
     resize: none;
 }
 
+/** temp: the OK , Cancel on share modal **/
 button.cbutton.cbutton--effect-sanja {
     flex: 1;
     padding: 1em;
