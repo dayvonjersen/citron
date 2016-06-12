@@ -1,3 +1,6 @@
+/**
+ * layout
+ */
 html, body {
     font-family: sans-serif;
     background: #fefbf6;
@@ -21,60 +24,25 @@ body > footer {
     padding-right: 10%;
 }
 
-.play {
-    width: 96px;
-    height: 96px;
-    fill: #fef200;
-    box-shadow: 0 0 0 2px #fff, -8px 0 108px -5px rgba(254,242,0,1);
-    border-radius: 50%;
-/*    filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));*/
-}
-
-.wave {
-    width: 100%;
-    height:100px;
-}
-
-h1 {
-    font-size: 26px;
-    margin-bottom: 2px;
-}
-
-time {
-    position:absolute;
-    right:0;
-    bottom:0;
-    background:#1e181a;
-    color:#f3fbf6;
-    padding: 2px 4px;
-}
-
+/**
+ * header
+ */
 body > header {
     height: 64px;
     text-align: center;
 }
 
-article {
-    margin: 64px 0;
-}
-input, textarea {
-    display: block;
-    width: 100%;
-    border: 1px inset;
-    padding: .5em 1em;
-    box-sizing: border-box;
-    margin-bottom: 1em;
-    resize: none;
+/**
+ * never ever use ids in css under any circumstance ever
+ */
+#errorMessage {
+    color: #ed1b24;
+    line-height: 64px;
 }
 
-.not-playing {
-    filter:invert(1);
-    -webkit-filter:invert(1);
-}
-.playing {
-    background:#1e181a;
-}
-
+/**
+ * footer
+ */
 footer {
     text-align: center;
     color: rgba(30, 24, 26, 0.15);
@@ -86,7 +54,94 @@ footer strike {
     transform: rotate(-45deg);
 }
 
-#errorMessage {
-    color: #ed1b24;
-    line-height: 64px;
+/**
+ * logo
+ */
+.citrus__logo {
+    width:108.6666666666667px;
+    height:78px;
+    filter:drop-shadow(0 0 4px rgba(254,242,0,1));
+    -webkit-filter:drop-shadow(0 0 4px rgba(254,242,0,1));
+}
+
+/**
+ * suprême
+ */
+/*article*/.citrus__suprême {
+    position: relative;
+    margin: 64px 0;
+}
+
+.citrus__suprême-inner-row {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+}
+
+.citrus__suprême-playpause-column {
+    flex: 0 1 auto;
+    margin-right: 16px;
+}
+
+/*svg*/.citrus__suprême-playpause-button {
+    width: 96px;
+    height: 96px;
+    fill: #fef200;
+    box-shadow: 0 0 0 2px #fff, -8px 0 108px -5px rgba(254,242,0,1);
+    border-radius: 50%;
+    filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));
+    -webkit-filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));
+}
+
+.citrus__suprême-waveform-column {
+    flex: auto;
+}
+/*.citrus__suprême-waveform-column*/.not-playing {
+    filter:invert(1);
+    -webkit-filter:invert(1);
+}
+/*.citrus__suprême-waveform-column*/.playing {
+    background:#1e181a;
+}
+
+/*time*/.citrus__suprême-createdat-time {
+    font-size: 12px;
+    float: right;
+    color: #ccc;
+}
+
+/*div[style*="background-image"]*/.citrus__suprême-waveform-display {
+    background-size: 100% 100%;
+}
+
+/*time*/.citrus__suprême-duration-time {
+    position:absolute;
+    right:0;
+    bottom:0;
+    background:#1e181a;
+    color:#f3fbf6;
+    padding: 2px 4px;
+}
+
+/*h1*/.citrus__suprême-title {
+    font-size: 26px;
+    margin-bottom: 2px;
+}
+
+/**
+ * forms
+ */
+input, textarea {
+    display: block;
+    width: 100%;
+    border: 1px inset;
+    padding: .5em 1em;
+    box-sizing: border-box;
+    margin-bottom: 1em;
+    resize: none;
+}
+
+button.cbutton.cbutton--effect-sanja {
+    flex: 1;
+    padding: 1em;
 }
