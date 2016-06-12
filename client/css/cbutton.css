@@ -74,3 +74,8 @@
 		transform: scale3d(1, 1, 1);
 	}
 }
+
+button.cbutton.cbutton--effect-sanja {
+    flex: 1;
+    padding: 1em;
+}

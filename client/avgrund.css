@@ -29,7 +29,7 @@
 		visibility: visible;
 		opacity: 1;
 	}
-
+/*
 .avgrund-contents {
 	position: relative;
 	padding: 20px;
@@ -37,6 +37,7 @@
 	height: 100%;
 	margin: auto;
 }
+*/
 	.avgrund-active .avgrund-contents {
 		-webkit-filter: blur(2px);
 		   -moz-filter: blur(2px);
