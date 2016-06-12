@@ -311,7 +311,26 @@ window.addEventListener("load", () => {
 
     let rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
-    setInterval(() => document.title = document.title.substr(1)+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(document.title[0])), 250);
+    setInterval( () => {
+        let substr = "";
+            let prevCp = document.title.codePointAt(0);
+            let prevCc = document.title.charCodeAt(0);
+        for(let c = 1; c < document.title.length; c++) {
+            let cp = document.title.codePointAt(c);
+            let cc = document.title.charCodeAt(c);
+
+            if( cp < 65535 && cp === cc ) {
+                if( prevCp === prevCc){
+                    substr += String.fromCodePoint(cp);
+                }
+            } else if(cp > 65535) {
+                substr += String.fromCodePoint(cp);
+            }
+            prevCp = cp;
+            prevCc = cc;
+        }
+        document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(document.title.codePointAt(0))));
+    }, 250);    
 
 });
         </script>
