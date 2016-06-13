@@ -11,17 +11,24 @@ function processAudioFile(audioFile, doneFn) {
 
 function _processAudioFile(audioData, doneFn) {
     let audioCtx = new AudioContext();
-    let canvasElement = document.createElement('canvas');
-    let canvasCtx = canvasElement.getContext('2d');
 
     audioCtx.decodeAudioData(audioData, (audioBuffer) => {
         let width = Math.round(audioBuffer.duration * minPxPerSec * pixelRatio);
-        canvasElement.width = width;
-        canvasElement.height = 128;
         let peaks = getPeaks(audioBuffer, width);
-        drawPeaks(canvasCtx, peaks, width);
-        doneFn(canvasElement.toDataURL(), audioBuffer.duration);
+        doneFn(peaks, audioBuffer.duration);
     });
+}
+
+function getWaveformDataURI(peaks, duration) {
+    let canvasElement = document.createElement('canvas');
+    let canvasCtx = canvasElement.getContext('2d');
+
+    let width = Math.round(duration * minPxPerSec * pixelRatio);
+    canvasElement.width = width;
+    canvasElement.height = 128;
+
+    drawPeaks(canvasCtx, peaks, width);
+    return canvasElement.toDataURL();
 }
 
 function getPeaks(audioBuffer, length, splitChannels=false) {

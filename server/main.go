@@ -14,7 +14,7 @@ import (
 type Suprême struct {
 	FileName    string    `json:"fileName"`
 	MagnetURI   string    `json:"magnetURI"`
-	WaveformURI string    `json:"waveformURI"`
+	WaveformURI []float64 `json:"waveformURI"`
 	Duration    uint64    `json:"duration"`
 	CreatedAt   time.Time `json:"createdAt"`
 }

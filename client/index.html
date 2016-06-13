@@ -270,7 +270,11 @@ window.addEventListener("load", () => {
         duration.innerHTML = fduration(data.duration);
         duration.dataset.value = data.duration;
 
-        waveformURI.style.backgroundImage = "url(" + data.waveformURI + ")";
+        new Promise( (resolve) => {
+            resolve(getWaveformDataURI(data.waveformURI, data.duration));
+        }).then( (datauri) => {
+            waveformURI.style.backgroundImage = "url(" + datauri + ")";
+        });
 
         mainElement.appendChild(tpl);
         
