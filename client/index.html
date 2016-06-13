@@ -239,6 +239,7 @@ window.addEventListener("load", () => {
         console.error(msg);
         errorMessageElement.innerHTML = msg;
         errorMessageElement.classList.remove("fadeout");
+        setTimeout(()=>errorMessageElement.classList.add("fadeout"),2000);
     };
     errorMessageElement.addEventListener("click", () => {
         errorMessageElement.classList.add("fadeout");
@@ -471,10 +472,10 @@ window.addEventListener("load", () => {
         }
 
         if("video/ogg" !== files[0].type && !validMimetypes.test(files[0].type)) {
-            errorMessage(`MP3, OGG, or WAV only! Yell at ${ "chrome" in window ? "google" : "mozApps" in navigator ? "firefox" : "whoever makes your browser" } to support ${files[0].type}`);
+            errorMessage(`MP3, OGG, or WAV only! Yell at ${ "chrome" in window ? "google" : "mozApps" in navigator ? "mozilla" : "whoever makes your browser" } to support ${files[0].type}`);
             return;
         }
-         // prompt for a title, enable cancel
+        
         openModal("uploadAndShare");
 
         let uploadAndShareModal = document.querySelector("#uploadAndShareModal");
@@ -482,10 +483,7 @@ window.addEventListener("load", () => {
         let okButton = uploadAndShareModal.querySelector("button.ok");
         let cancelButton = uploadAndShareModal.querySelector("button.cancel");
 
-        // I wanted to make this a clever one-liner :(
-        let fname = files[0].name.split(".");
-        fname.pop();
-        fileNameInput.value = fname.join(".") || "";
+        fileNameInput.value = files[0].name.split(".").reverse().filter((v,k)=>k).reverse().join(".") || "";
 
         setTimeout(()=>fileNameInput.focus(), 500);
 
@@ -499,11 +497,11 @@ window.addEventListener("load", () => {
         let promptedTheUser = new Promise((resolve, reject) => {
             okButton.onclick = () => {
                 metadata.fileName = fileNameInput.value; // xxx sanitize...
-                resolve(1);
+                resolve(true);
             };
             cancelButton.onclick = () => {
                 Avgrund.hide("#uploadAndShareModal");
-                reject(1);
+                reject(true);
             };
         });
 
@@ -528,10 +526,11 @@ window.addEventListener("load", () => {
             console.log("promise.all complete");
             //console.log(JSON.stringify(metadata));
             sendPayload(metadata);
+        }, () => {
+            console.log("Something happened.")
         });
     };
 
-    // attachtobuttan
     let uploadFile = document.querySelector("input[type='file']");
     uploadFile.onchange = () => doUpload(uploadFile.files);    
 
