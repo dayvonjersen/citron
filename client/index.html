@@ -57,25 +57,28 @@
                     <!--
                         arrow
                     -->
-                    <div onclick="testModal()" class="cbutton cbutton--effect-sanja" style="margin-top:-16px;">
-                        <svg style="width:32px;height:32px;fill:#1e181a" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                            <g>
-                                <path d="M54,37.7V91c0,2.2-1.8,4-4,4s-4-1.8-4-4V37.7L26.7,54.9c-1.7,1.5-4.2,1.4-5.7-0.3 s-1.3-4.2,0.3-5.6l26-23.1l2.7-2.4l2.7,2.4l26,23.1c1.7,1.5,1.8,4,0.3,5.6c-1.5,1.7-4,1.8-5.6,0.3L54,37.7L54,37.7z M76,13 c2.2,0,4-1.8,4-4s-1.8-4-4-4H24c-2.2,0-4,1.8-4,4s1.8,4,4,4H76L76,13z"/>
-                            </g>
-                        </svg>
+                    <div class="cbutton cbutton--effect-sanja" style="margin-top:-16px;">
+                        <label>
+                            <svg style="width:32px;height:32px;fill:#1e181a" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                                <g>
+                                    <path d="M54,37.7V91c0,2.2-1.8,4-4,4s-4-1.8-4-4V37.7L26.7,54.9c-1.7,1.5-4.2,1.4-5.7-0.3 s-1.3-4.2,0.3-5.6l26-23.1l2.7-2.4l2.7,2.4l26,23.1c1.7,1.5,1.8,4,0.3,5.6c-1.5,1.7-4,1.8-5.6,0.3L54,37.7L54,37.7z M76,13 c2.2,0,4-1.8,4-4s-1.8-4-4-4H24c-2.2,0-4,1.8-4,4s1.8,4,4,4H76L76,13z"/>
+                                </g>
+                            </svg>
+                            <input type="file" style="display:none">
+                        </label>
                     </div>
-            </div></div>
+                </div>
+            </div>
         </header>
 
         <main class="avgrund-contents">Loading...</main>
 
         <footer>
             <hr>
-            
-                <!--
-                    knob
-                -->
-                    <input type="range" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
+            <!--
+                knob
+            -->
+            <input type="range" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
         </footer>
 
         <!--
@@ -132,14 +135,14 @@
         <!--
             share
         -->
-        <template id="share">
+        <template id="uploadAndShare">
             <aside class="avgrund-popup">
                 <input autofocus required placeholder="DJ Unknown - &quot;untitled (unReleased Mix)&quot;" name="fileName">
-                <textarea placeholder="shout out to you, i'm sending a shoutout to all the mofherf** in them after-hour spots..."></textarea>
-                <input placeholder="#yoloswag">
+                <!-- <textarea disabled placeholder="shout out to you, i'm sending a shoutout to all the mofherf** in them after-hour spots..."></textarea> -->
+                <!-- <input disabled placeholder="#yoloswag"> -->
                 <div style="display:flex">
-                    <button class="cbutton cbutton--effect-sanja">OK</button>
-                    <button class="cbutton cbutton--effect-sanja">Cancel</button>
+                    <button class="ok cbutton cbutton--effect-sanja">OK</button>
+                    <button class="cancel cbutton cbutton--effect-sanja">Cancel</button>
                 </div>
             </aside>
         </template>
@@ -161,30 +164,10 @@
 
         <script>
 // dummies
-window.testModal = () => {}
 window.aboutModal = () => {}
 
 // int main(void) {
 window.addEventListener("load", () => {
-    
-    // xxx
-    window.testModal = () => {
-        if(!document.getElementById("shareModal")) {
-            let tpl = getTemplate("share");
-            tpl.firstElementChild.setAttribute("id", "shareModal");
-            document.body.appendChild(tpl);
-        }
-        Avgrund.show("#shareModal");
-    };    
-    window.aboutModal = () => {
-        if(!document.getElementById("aboutModal")) {
-            let tpl = getTemplate("about");
-            tpl.firstElementChild.setAttribute("id", "aboutModal");
-            document.body.appendChild(tpl);
-        }
-        Avgrund.show("#aboutModal");
-    };
-    //xxx
 
     //
     // utility functions
@@ -192,6 +175,19 @@ window.addEventListener("load", () => {
 
     // stamps out a <template>
     let getTemplate = (id) => document.getElementById(id).content.cloneNode(true);
+
+    // displays a box
+    let openModal = (id) => {
+        let modalId = id+"Modal";
+        if(!document.getElementById(modalId)) {
+            let tpl = getTemplate(id);
+            tpl.firstElementChild.setAttribute("id", modalId);
+            document.body.appendChild(tpl);
+        }
+        Avgrund.show("#"+modalId);
+    };
+    // xxx
+    window.aboutModal = () => openModal("about");
 
     // unique ids for things
     let q = () => parseInt(Math.pow(2,32)*Math.random(),10).toString(16);
@@ -242,8 +238,10 @@ window.addEventListener("load", () => {
     window.errorMessage = (msg) => {
         console.error(msg);
         errorMessageElement.innerHTML = msg;
+        errorMessageElement.classList.remove("fadeout");
     };
     errorMessageElement.addEventListener("click", () => {
+        errorMessageElement.classList.add("fadeout");
         errorMessageElement.innerHTML = "";
     });
 
@@ -461,7 +459,35 @@ window.addEventListener("load", () => {
     //
 
     let seederClient = new WebTorrent();
-    DragDrop('html', (files) => {
+
+    const validMimetypes = /^audio\/(x\-)?((mp((e)?g(audio|3)?|3))|wav|ogg)$/;
+
+    let doUpload = function(files) {
+
+        if(!files.length) return;
+        if(files.length > 1) {
+            errorMessage("One file at a time, please!");
+            return;
+        }
+
+        if("video/ogg" !== files[0].type && !validMimetypes.test(files[0].type)) {
+            errorMessage(`MP3, OGG, or WAV only! Yell at ${ "chrome" in window ? "google" : "mozApps" in navigator ? "firefox" : "whoever makes your browser" } to support ${files[0].type}`);
+            return;
+        }
+         // prompt for a title, enable cancel
+        openModal("uploadAndShare");
+
+        let uploadAndShareModal = document.querySelector("#uploadAndShareModal");
+        let fileNameInput = uploadAndShareModal.querySelector("input[name='fileName']");
+        let okButton = uploadAndShareModal.querySelector("button.ok");
+        let cancelButton = uploadAndShareModal.querySelector("button.cancel");
+
+        // I wanted to make this a clever one-liner :(
+        let fname = files[0].name.split(".");
+        fname.pop();
+        fileNameInput.value = fname.join(".") || "";
+
+        setTimeout(()=>fileNameInput.focus(), 500);
 
         let metadata = {
             fileName: "",
@@ -469,6 +495,17 @@ window.addEventListener("load", () => {
             waveformURI: "",
             duration: 0
         };
+
+        let promptedTheUser = new Promise((resolve, reject) => {
+            okButton.onclick = () => {
+                metadata.fileName = fileNameInput.value; // xxx sanitize...
+                resolve(1);
+            };
+            cancelButton.onclick = () => {
+                Avgrund.hide("#uploadAndShareModal");
+                reject(1);
+            };
+        });
 
         let processedTheAudioFile = new Promise((resolve, reject) => {
             processAudioFile(files[0], (waveformURI, duration) => {
@@ -487,14 +524,18 @@ window.addEventListener("load", () => {
             });
         });
 
-        //xxx
-
-        Promise.all([processedTheAudioFile, seededTheTorrent]).then(() => {
+        Promise.all([promptedTheUser, processedTheAudioFile, seededTheTorrent]).then(() => {
             console.log("promise.all complete");
             //console.log(JSON.stringify(metadata));
             sendPayload(metadata);
         });
-    });
+    };
+
+    // attachtobuttan
+    let uploadFile = document.querySelector("input[type='file']");
+    uploadFile.onchange = () => doUpload(uploadFile.files);    
+
+    DragDrop('html', (files) => doUpload(files));
 
     //
     // gimmicks

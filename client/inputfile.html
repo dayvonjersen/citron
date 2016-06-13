@@ -1,0 +1,22 @@
+<input type="file">
+
+<script>
+window.onload = () => {
+    let inputFile = document.querySelector("input[type='file']");
+    inputFile.oninput = () => {
+        console.log("input!");
+        console.log(JSON.stringify(inputFile.files));
+    };
+    inputFile.onchange = () => {
+        console.log("change!");
+        console.log(JSON.stringify(inputFile.files));
+    };/*
+
+    let reader = new FileReader();
+    reader.onload = (event) => { 
+        console.log("reader.onload!");
+        console.log(JSON.stringify(event.target));
+    };
+    reader.readAs*/
+};
+</script>

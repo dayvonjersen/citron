@@ -38,6 +38,13 @@ body > header {
 #errorMessage {
     color: #ed1b24;
     line-height: 64px;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 5s linear;
+}
+
+/*#errorMessage*/.fadeout {
+    opacity: 0;
 }
 
 /**
@@ -116,6 +123,7 @@ footer hr {
 
 .citrus__suprême-waveform-column {
     filter: drop-shadow(2px 2px rgb(204, 204, 204));
+    -webkit-filter: drop-shadow(2px 2px rgb(204, 204, 204));
 }
 /*img*/.waveform--yellow, .waveform--black {
     width: 100%;
