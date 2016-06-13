@@ -151,6 +151,9 @@ button.cbutton.cbutton--effect-sanja {
 .citrus__volume {
     width: 128px;
     display: inline-block;
+    padding: 0;
+    border: 0;
+    margin: 0;
     /* transition: width 0.125s linear; */
 }
 
