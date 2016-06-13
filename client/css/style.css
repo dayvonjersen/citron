@@ -60,8 +60,6 @@ footer hr {
 .citrus__logo {
     width:108.6666666666667px;
     height:78px;
-    filter:drop-shadow(0 0 4px rgba(254,242,0,1));
-    -webkit-filter:drop-shadow(0 0 4px rgba(254,242,0,1));
 }
 
 /**
@@ -89,8 +87,8 @@ footer hr {
     fill: #fef200;
     box-shadow: 0 0 0 2px #fff, -8px 0 108px -5px rgba(254,242,0,1);
     border-radius: 50%;
-    filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));
-    -webkit-filter: drop-shadow(0 0 20px rgba(30,24,26,0.2));
+    /* filter: drop-shadow(0 0 20px rgba(30,24,26,0.2)); */
+    /* -webkit-filter: drop-shadow(0 0 20px rgba(30,24,26,0.2)); */
 }
 
 .citrus__suprême-waveform-column {
@@ -152,6 +150,7 @@ button.cbutton.cbutton--effect-sanja {
  */
 .citrus__volume {
     width: 128px;
+    display: inline-block;
     /* transition: width 0.125s linear; */
 }
 
