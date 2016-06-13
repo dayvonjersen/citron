@@ -151,9 +151,10 @@ button.cbutton.cbutton--effect-sanja {
  * volume slider
  */
 .citrus__volume {
-    width: 32px;
+    width: 128px;
+    /* transition: width 0.125s linear; */
 }
 
 .citrus__volume:hover {
-    width: 128px;
+    /* width: 128px; */
 }
