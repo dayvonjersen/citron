@@ -42,34 +42,49 @@
     </head>
     <body>
         <header>
-            <!--
-                lemon
-            -->
-            <div onclick="aboutModal()" class="cbutton cbutton--effect-sanja" style="float:left;margin-top:3px;">
-                <img src="lemon.svg" class="citrus__logo">
-            </div>
+            <div style="display:flex;align-items:center">
+                <!--
+                    lemon
+                -->
+                <div style="flex:0 1;">
+                    <div onclick="aboutModal()" class="cbutton cbutton--effect-sanja" style="margin-top:3px;">
+                        <img src="lemon.svg" class="citrus__logo">
+                    </div>
+                </div>
 
-            <!--
-                upload
-            -->
-            <div onclick="testModal()" class="cbutton cbutton--effect-sanja" style="float:right;margin-top:16px;">
-                <svg style="width:32px;height:32px;fill:#1e181a" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <g>
-                        <path d="M54,37.7V91c0,2.2-1.8,4-4,4s-4-1.8-4-4V37.7L26.7,54.9c-1.7,1.5-4.2,1.4-5.7-0.3 s-1.3-4.2,0.3-5.6l26-23.1l2.7-2.4l2.7,2.4l26,23.1c1.7,1.5,1.8,4,0.3,5.6c-1.5,1.7-4,1.8-5.6,0.3L54,37.7L54,37.7z M76,13 c2.2,0,4-1.8,4-4s-1.8-4-4-4H24c-2.2,0-4,1.8-4,4s1.8,4,4,4H76L76,13z"/>
-                    </g>
-                </svg>
-            </div>
+                <!--
+                    knob
+                -->
+                <div style="flex:0 1;">
+                    <input type="range" class="citrus__volume" title="adjust volume">
+                </div>
 
-            <!--
-                errors
-            -->
-            <p id="errorMessage"></p>
+                <div style="flex:1;align-self:flex-start">
+                    <!--
+                        scary red text
+                    -->
+                    <p id="errorMessage"></p>
+                </div>
+
+                <div style="flex:0 1;">
+                    <!--
+                        arrow
+                    -->
+                    <div onclick="testModal()" class="cbutton cbutton--effect-sanja" style="margin-top:-16px;">
+                        <svg style="width:32px;height:32px;fill:#1e181a" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <g>
+                                <path d="M54,37.7V91c0,2.2-1.8,4-4,4s-4-1.8-4-4V37.7L26.7,54.9c-1.7,1.5-4.2,1.4-5.7-0.3 s-1.3-4.2,0.3-5.6l26-23.1l2.7-2.4l2.7,2.4l26,23.1c1.7,1.5,1.8,4,0.3,5.6c-1.5,1.7-4,1.8-5.6,0.3L54,37.7L54,37.7z M76,13 c2.2,0,4-1.8,4-4s-1.8-4-4-4H24c-2.2,0-4,1.8-4,4s1.8,4,4,4H76L76,13z"/>
+                            </g>
+                        </svg>
+                    </div>
+            </div></div>
         </header>
 
         <main class="avgrund-contents">Loading...</main>
 
         <footer>
-            <strike>℗</strike>
+            <hr>
+            ☙
         </footer>
 
         <!--
@@ -100,7 +115,7 @@
         -->
         <template id="share">
             <aside class="avgrund-popup">
-                <input required placeholder="DJ Unknown - &quot;untitled (unReleased Mix)&quot;" name="fileName">
+                <input autofocus required placeholder="DJ Unknown - &quot;untitled (unReleased Mix)&quot;" name="fileName">
                 <textarea placeholder="shout out to you, i'm sending a shoutout to all the mofherf** in them after-hour spots..."></textarea>
                 <input placeholder="#yoloswag">
                 <div style="display:flex">
@@ -205,7 +220,7 @@ window.addEventListener("load", () => {
 
     // shows red text at the top of page
     let errorMessageElement = document.getElementById("errorMessage");
-    let errorMessage = (msg) => {
+    window.errorMessage = (msg) => {
         console.error(msg);
         errorMessageElement.innerHTML = msg;
     };

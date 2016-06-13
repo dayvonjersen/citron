@@ -45,13 +45,13 @@ body > header {
  */
 footer {
     text-align: center;
-    color: rgba(30, 24, 26, 0.15);
+    color: rgba(30, 24, 26, 0.25);
     padding: 1em 0;
 }
-footer strike {
-    font-size: 32px;
-    display: block;
-    transform: rotate(-45deg);
+
+footer hr {
+    border: 1px rgba(30, 24, 26, 0.25) solid;
+    margin-bottom: 1em;
 }
 
 /**
@@ -145,4 +145,15 @@ input, textarea {
 button.cbutton.cbutton--effect-sanja {
     flex: 1;
     padding: 1em;
+}
+
+/**
+ * volume slider
+ */
+.citrus__volume {
+    width: 32px;
+}
+
+.citrus__volume:hover {
+    width: 128px;
 }

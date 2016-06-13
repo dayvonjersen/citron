@@ -123,9 +123,17 @@ function forgreatJustice() {
     updatePosition();
 }
 
+function youknowwhatyoudoing(e) {
+    takeoffeveryZig(e);
+    moveZig(e);
+}
 containerElement.ondragstart = takeoffeveryZig;
+containerElement.ontouchstart = youknowwhatyoudoing;
+containerElement.onmousedown = youknowwhatyoudoing;
 containerElement.ondrag = moveZig;
 containerElement.ondragend = forgreatJustice;
+containerElement.ontouchend = forgreatJustice;
+containerElement.onmouseup = forgreatJustice;
 
 });
 
