@@ -10,8 +10,8 @@
 }
 
 .cbutton:hover {
-    filter:drop-shadow(0 0 4px rgba(254,242,0,1));
-    -webkit-filter:drop-shadow(0 0 4px rgba(254,242,0,1));
+    filter:drop-shadow(0 0 1px rgba(254,242,0,1));
+    -webkit-filter:drop-shadow(0 0 1px rgba(254,242,0,1));
 }
 
 .cbutton.cbutton--click,

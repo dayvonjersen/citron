@@ -82,11 +82,14 @@
             suprême
         -->
         <template id="suprême">
-            <article class="citrus__suprême">
+            <article class="citrus__suprême citrus__suprême--paused">
                 <div class="citrus__suprême-inner-row">
-                    <div class="citrus__suprême-playpause-column play">
-                        <svg class="citrus__suprême-playpause-button" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" >
+                    <div class="citrus__suprême-playpause-column">
+                        <svg class="citrus__suprême-playpause-button play" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" >
                             <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M38.7,72.4V27.2l34.9,22.6L38.7,72.4z"/>
+                        </svg>
+                        <svg class="citrus__suprême-playpause-button pause" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M45,72.4H33V27.2h12V72.4z M67,72.4H55 V27.2h12V72.4z"/>
                         </svg>
                     </div>
                     <div class="citrus__suprême-waveform-column not-playing">
@@ -94,7 +97,7 @@
                             <span class="fileName"></span>
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
-                        <div class="waveformBox"  style="position:relative;overflow:hidden;white-space:nowrap">
+                        <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap">
                             <!-- left: position + "%"; -->
                             <div data-style-property="left" style="position:absolute;left:0%;height:100%;">
                                 <div class="slider"></div>
@@ -385,8 +388,11 @@ window.addEventListener("load", () => {
             })(data.magnetURI) );
             */
 
+        // xxx
         var tmp = tpl.querySelector('article');
         playbutton.addEventListener("click", () => {
+            tmp.classList.toggle("citrus__suprême--paused");
+            return;
             var audioElement = document.createElement("audio");
             audioElement.controls = 1;
             audioElement.src = encodeURI("the bf project - Onion Dear.ogg");

@@ -85,10 +85,23 @@ footer hr {
     width: 96px;
     height: 96px;
     fill: #fef200;
-    box-shadow: 0 0 0 2px #fff, -8px 0 108px -5px rgba(254,242,0,1);
+    box-shadow: 0 0 0 2px #fff, -8px 0 19px -5px rgba(254,242,0,1);
     border-radius: 50%;
     /* filter: drop-shadow(0 0 20px rgba(30,24,26,0.2)); */
     /* -webkit-filter: drop-shadow(0 0 20px rgba(30,24,26,0.2)); */
+    transition: all 0.125s ease-out;
+    cursor: pointer;
+}
+
+.citrus__suprême-playpause-button:hover,
+.citrus__suprême-playpause-button:active,
+.citrus__suprême-playpause-button:focus {
+    box-shadow: 0 0 0 2px #fff, -8px 0 108px -5px rgba(254,242,0,1);
+}
+
+.citrus__suprême--paused .pause,
+.citrus__suprême:not(.citrus__suprême--paused) .play {
+    display: none;
 }
 
 /*time*/.citrus__suprême-createdat-time {
@@ -97,13 +110,10 @@ footer hr {
     color: #ccc;
 }
 
-/*div[style*="background-image"]*/.citrus__suprême-waveform-display {
-    background-size: 100% 100%;
-}
-
 /*img*/.waveform--yellow, .waveform--black {
     width: 100%;
     height: 128px;
+    cursor: pointer;
 }
 
 /*time*/.citrus__suprême-duration-time {
