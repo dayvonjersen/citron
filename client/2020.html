@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+    <body>
+        <div class="container" style="position:relative;overflow:hidden;white-space:nowrap">
+            <!-- left: position + "%"; -->
+            <div data-style-property="left" style="position:absolute;left:0%;height:100%;">
+                <div class="slider"></div>
+            </div>
+            
+            <!-- left: (position - 100) + "%"; -->
+            <div data-style-property="left" data-invert-position="1" style="display:inline-block;width:100%;position:relative;vertical-align:bottom;left:0%;overflow:hidden">
+                <!-- right: (position - 100) + "%"; -->
+                <div data-style-property="right" data-invert-position="1" style="position:relative;right:0%;text-align:center">
+                    <!-- "top" image -->
+                    <img src="waveform-fill.png">
+                </div>
+            </div>
+            
+            <!-- left: (position - 100) + "%"; -->
+            <div data-style-property="left" data-invert-position="1" style="display:inline-block;width:100%;position:relative;vertical-align:bottom;left:0%;overflow:hidden">
+                <!-- right: position + "%"; -->
+                <div data-style-property="right" style="position:relative;right:0%;text-align:center">
+                    <!-- "bottom" image -->
+                    <img src="waveform.png">
+                </div>
+            </div>
+        </div>
+        <script>
+window.addEventListener("load", () => {
+
+const minDistance = 0;
+const maxAngle = Infinity;
+const DEGREES_IN_RADIAN = 180 / Math.PI;
+
+var state = {
+    x: NaN,
+    y: NaN,
+    isDragging: false,
+    position: 0.5
+};
+
+var containerElement = document.querySelector(".container");
+
+function updatePosition() {
+    [].forEach.call(document.querySelectorAll("[data-style-property]"), function(childElement) {
+        var pos = (childElement.dataset.invertPosition ? state.position - 1 : state.position).toPrecision(6) * 100;
+        childElement.style[childElement.dataset.styleProperty] = pos+"%";
+    });
+}
+
+function takeoffeveryZig(e) {
+    console.log("begin");
+
+    if(e) e.preventDefault();
+    const isTouch = 'touches' in e;
+
+    let pageX, pageY;
+    if(isTouch) {
+        pageX = e.touches[0].pageX;
+        pageY = e.touches[0].pageY;
+    } else {
+        pageX = e.pageX;
+        pageY = e.pageY;
+    }
+
+    state.x = pageX;
+    state.y = pageY;
+
+    document.addEventListener('mousemove', moveZig)
+    document.addEventListener('touchmove', moveZig)
+    document.addEventListener('mouseup', forgreatJustice);
+    document.addEventListener('touchend', forgreatJustice);
+}
+
+function moveZig(e) {
+    console.log("move");
+
+    const isTouch = 'touches' in e;
+
+    let pageX, pageY;
+    if(isTouch) {
+        pageX = e.touches[0].pageX;
+        pageY = e.touches[0].pageY;
+    } else {
+        pageX = e.pageX;
+        pageY = e.pageY;
+    }
+
+    if(!state.isDragging && isTouch) {
+        const dx = state.x - pageX;
+        const dy = state.y - pageY;
+
+        const angle = Math.atan(dy/dx) * DEGREES_IN_RADIAN;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        let isDragging = distance >= minDistance;
+        if(isDragging && Math.abs(angle) > maxAngle) {
+            // They're trying to scroll vertically
+            forgreatJustice();
+            return;
+        } else if(!isDragging) {
+            return;
+        }
+        state.isDragging = isDragging;
+    }
+
+    const rect = containerElement.getBoundingClientRect();
+    state.position = Math.max(Math.min( ((pageX - rect.left) / rect.width) , 1), 0);
+    updatePosition();
+}
+
+function forgreatJustice() {
+    console.log("end");
+    
+    document.removeEventListener('mousemove', moveZig)
+    document.removeEventListener('touchmove', moveZig)
+    document.removeEventListener('mouseup', forgreatJustice);
+    document.removeEventListener('touchend', forgreatJustice)
+
+    state.isDragging = false;
+    state.x = NaN;
+    state.y = NaN;
+    updatePosition();
+}
+
+containerElement.ondragstart = takeoffeveryZig;
+containerElement.ondrag = moveZig;
+containerElement.ondragend = forgreatJustice;
+
+});
+
+        </script>
+    </body>
+</html>

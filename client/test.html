@@ -7,28 +7,54 @@
         </style>
     </head>
     <body>
-        <div id="dropzone" style="border:5px dashed;padding:125px"><h1>HELLO?</h1></div>
-        <div id="waveform"></div>
+        
+        <div id="dropzone" style="border:3px dashed #ccc;border-radius:10%;padding:66px;text-align:center"><h1>&uarr;</h1></div>
+
+        <h1 id="fname"></h1>
+        <div id="webtorrent"></div>
+        <div id="wavesurfer"></div>
+        
         <script src="dragdrop.min.js"></script>
         <script src="webtorrent.min.js"></script>
-        <script src="waveform.js"></script>
+        <script src="wavesurfer.js"></script>
+
         <script>
             let client = new WebTorrent();
             DragDrop('#dropzone', (files) => {
-                drawWaveform("#waveform", files[0]);
                 
-/*
                 client.seed(files, (torrent) => {
                     let client2 = new WebTorrent();
                     client2.add(torrent.magnetURI, (torrent) => {
-                        //torrent.files[0].appendTo('body');
-                        torrent.files[0].getBuffer((err, buffer) => {
-                            if(err)  console.error(err);
 
-                            wavesurfer.loadArrayBuffer(buffer);
+                        fname.innerHTML = torrent.files[0].name;
+
+                        torrent.files[0].appendTo('#webtorrent', (err, audioElement) => {
+                            if(err) throw err;
+/*
+                            var audioCtx = new AudioContext();
+                            var src = audioCtx.createMediaElementSource(audioElement);
+                            src.connect(audioCtx.destination);
+*/
+                            wavesurfer = WaveSurfer.create({
+                                container: "#wavesurfer",
+                                backend: "MediaElement",
+                                mediaContainer: audioElement
+                            });
+
                         });
+ /*
+
+                        torrent.files[0].getBuffer( (err, buffer) => {
+                            if(err) throw err;
+
+                            var blob = new Blob(buffer, {type: "audio/ogg"})
+
+                            wavesurfer.loadBlob(blob);
+                        });
+
+  */
                     });
-                });*/
+                });
             });
         </script>
     </body>
