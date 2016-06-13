@@ -23,12 +23,6 @@
         <script src="waveform.js" async></script>
 
         <!--
-            teh WebComponents rEvoLuTiOn~
-        -->
-        <link rel="stylesheet" href="webcomponents/dist/webcomponents.css">
-        <script src="webcomponents/dist/webcomponents.js" async></script>
-
-        <!--
             Avgrund!
         -->
         <link rel="stylesheet" href="css/avgrund.css">
@@ -95,12 +89,35 @@
                             <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M38.7,72.4V27.2l34.9,22.6L38.7,72.4z"/>
                         </svg>
                     </div>
-                    <div class="citrus__suprême-waveform-column waveformBox not-playing">
+                    <div class="citrus__suprême-waveform-column not-playing">
                         <h1 class="citrus__suprême-title">
                             <span class="fileName"></span>
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
-                        <div class="citrus__suprême-waveform-display waveformURI"></div>
+                        <div class="waveformBox"  style="position:relative;overflow:hidden;white-space:nowrap">
+                            <!-- left: position + "%"; -->
+                            <div data-style-property="left" style="position:absolute;left:0%;height:100%;">
+                                <div class="slider"></div>
+                            </div>
+
+                            <!-- left: (position - 100) + "%"; -->
+                            <div data-style-property="left" data-invert-position="1" style="display:inline-block;width:100%;position:relative;vertical-align:bottom;left:0%;overflow:hidden">
+                                <!-- right: (position - 100) + "%"; -->
+                                <div data-style-property="right" data-invert-position="1" style="position:relative;right:0%;text-align:center">
+                                    <!-- "top" image -->
+                                    <img class="waveform--yellow">
+                                </div>
+                            </div>
+
+                            <!-- left: (position - 100) + "%"; -->
+                            <div data-style-property="left" data-invert-position="1" style="display:inline-block;width:100%;position:relative;vertical-align:bottom;left:0%;overflow:hidden">
+                                <!-- right: position + "%"; -->
+                                <div data-style-property="right" style="position:relative;right:0%;text-align:center">
+                                    <!-- "bottom" image -->
+                                    <img class="waveform--black">
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <time class="citrus__suprême-duration-time duration" data-value></time>
@@ -225,6 +242,122 @@ window.addEventListener("load", () => {
         errorMessageElement.innerHTML = "";
     });
 
+    // waveform box
+    // (useful comment, I know)
+    let inAD2101WarWasBeginning = (containerElement) => {
+        const minDistance = 0;
+        const maxAngle = Infinity;
+        const DEGREES_IN_RADIAN = 180 / Math.PI;
+
+        let state = {
+            x: NaN,
+            y: NaN,
+            isDragging: false,
+            position: 0
+        };
+
+        function updatePosition() {
+            if(containerElement.disabled) return;
+
+            [].forEach.call(containerElement.querySelectorAll("[data-style-property]"), function(childElement) {
+                var pos = (childElement.dataset.invertPosition ? state.position - 1 : state.position).toPrecision(6) * 100;
+                childElement.style[childElement.dataset.styleProperty] = pos+"%";
+            });
+        };
+
+        function takeoffeveryZig(e) {
+            if(e) e.preventDefault();
+            const isTouch = 'touches' in e;
+
+            let pageX, pageY;
+            if(isTouch) {
+                pageX = e.touches[0].pageX;
+                pageY = e.touches[0].pageY;
+            } else {
+                pageX = e.pageX;
+                pageY = e.pageY;
+            }
+
+            state.x = pageX;
+            state.y = pageY;
+
+            document.addEventListener('mousemove', moveZig);
+            document.addEventListener('touchmove', moveZig);
+            document.addEventListener('mouseup', forgreatJustice);
+            document.addEventListener('touchend', forgreatJustice);
+        };
+
+        function moveZig(e) {
+            const isTouch = 'touches' in e;
+
+            let pageX, pageY;
+            if(isTouch) {
+                pageX = e.touches[0].pageX;
+                pageY = e.touches[0].pageY;
+            } else {
+                pageX = e.pageX;
+                pageY = e.pageY;
+            }
+
+            if(!state.isDragging && isTouch) {
+                const dx = state.x - pageX;
+                const dy = state.y - pageY;
+
+                const angle = Math.atan(dy/dx) * DEGREES_IN_RADIAN;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                let isDragging = distance >= minDistance;
+                if(isDragging && Math.abs(angle) > maxAngle) {
+                    // They're trying to scroll vertically
+                    forgreatJustice();
+                    return;
+                } else if(!isDragging) {
+                    return;
+                }
+                state.isDragging = isDragging;
+            }
+
+            const rect = containerElement.getBoundingClientRect();
+            state.position = Math.max(Math.min( ((pageX - rect.left) / rect.width) , 1), 0);
+            updatePosition();
+        };
+
+        function forgreatJustice() {    
+            document.removeEventListener('mousemove', moveZig);
+            document.removeEventListener('touchmove', moveZig);
+            document.removeEventListener('mouseup', forgreatJustice);
+            document.removeEventListener('touchend', forgreatJustice);
+
+            state.isDragging = false;
+            state.x = NaN;
+            state.y = NaN;
+            updatePosition();
+        };
+
+        function youknowwhatyoudoing(e) {
+            takeoffeveryZig(e);
+            moveZig(e);
+        };
+
+        containerElement.ondragstart = takeoffeveryZig;
+        containerElement.ontouchstart = youknowwhatyoudoing;
+        containerElement.onmousedown = youknowwhatyoudoing;
+        containerElement.ondrag = moveZig;
+        containerElement.ondragend = forgreatJustice;
+        containerElement.ontouchend = forgreatJustice;
+        containerElement.onmouseup = forgreatJustice;
+
+        // set position to 0 on init
+        updatePosition();
+        // disable on first run, adding audio element enables
+        containerElement.disabled = true;
+        // provide hook to update position
+        containerElement.setPosition = (p) => {
+            state.position = p;
+            updatePosition();
+        };
+    };
+
     // attaches new segments 
     //xxx: needs some love
     let mainElement = document.querySelector("main");
@@ -232,8 +365,7 @@ window.addEventListener("load", () => {
     let addChild = (data) => {
 
         let tpl = getTemplate("suprême");
-        
-        let articleElement = tpl.querySelector('article');
+
         let fileName = tpl.querySelector('.fileName');
         //let magnetURI = tpl.querySelector('.magnetURI');
         let waveformURI = tpl.querySelector('.waveformURI');
@@ -241,21 +373,29 @@ window.addEventListener("load", () => {
         let createdAt = tpl.querySelector('.createdAt');
         let playbutton = tpl.querySelector('.play'); 
         let waveformBox = tpl.querySelector('.waveformBox');
-        
-        let uuid = uniqid();
-        articleElement.setAttribute("id", uuid);
-
+/*
         playbutton.addEventListener("click", (function(magnetURI){
             return (evt) => {
                 leecherClient.add(magnetURI, (torrent) => {
                     torrent.files[0].appendTo(`#${uuid}`);
+                    
+                    waveformBox.dataset.disabled = false;
                 });
             };
-        })(data.magnetURI) );
+            })(data.magnetURI) );
+            */
 
+        var tmp = tpl.querySelector('article');
         playbutton.addEventListener("click", () => {
-            waveformBox.classList.toggle('not-playing');
-            waveformBox.classList.toggle('playing');
+            var audioElement = document.createElement("audio");
+            audioElement.controls = 1;
+            audioElement.src = encodeURI("the bf project - Onion Dear.ogg");
+            audioElement.addEventListener("timeupdate", () => {
+                waveformBox.setPosition(audioElement.currentTime / data.duration);
+            });
+            tmp.appendChild(audioElement);
+            waveformBox.disabled = false;
+            audioElement.play();
         });
 
         fileName.innerHTML = data.fileName;
@@ -268,14 +408,19 @@ window.addEventListener("load", () => {
         duration.dataset.value = data.duration;
 
         new Promise( (resolve) => {
-            resolve(getWaveformDataURI(data.waveformURI, data.duration, "#fefbf6"));
-        }).then( (datauri) => {
-            waveformURI.style.backgroundImage = "url(" + datauri + ")";
+            resolve({
+                yellow: getWaveformDataURI(data.waveformURI, data.duration, "#fef200"),
+                black:  getWaveformDataURI(data.waveformURI, data.duration, "#1e181a")
+            });
+        }).then( (waveformImages) => {
+
+            waveformBox.querySelector('.waveform--yellow').src = waveformImages.yellow;
+            waveformBox.querySelector('.waveform--black').src = waveformImages.black;         
+            
+            inAD2101WarWasBeginning(waveformBox);
         });
 
         mainElement.appendChild(tpl);
-        
-        mainElement.querySelector(`#${uuid} .waveformURI`).innerHTML = `<input-range style="height:128px" max="${data.duration}"></input-range>`;
     };
 
     //
