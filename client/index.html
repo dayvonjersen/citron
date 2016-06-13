@@ -95,9 +95,11 @@
                     <div class="citrus__suprême-waveform-column not-playing">
                         <h1 class="citrus__suprême-title">
                             <span class="fileName"></span>
+                            <!-- <span>The Untitleds &mdash; &ldquo;Lorem Ipsum&rdquo;</span> -->
+                            <!-- <span class="links-n-stuff"><img style="display:inline;width:30px;height:30px;" src="magnet.svg">| 0 seeders | 35 leechers</span> -->
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
-                        <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap">
+                        <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
                             <!-- left: position + "%"; -->
                             <div data-style-property="left" style="position:absolute;left:0%;height:100%;">
                                 <div class="slider"></div>
@@ -353,7 +355,7 @@ window.addEventListener("load", () => {
         // set position to 0 on init
         updatePosition();
         // disable on first run, adding audio element enables
-        containerElement.disabled = true;
+        //containerElement.disabled = true;
         // provide hook to update position
         containerElement.setPosition = (p) => {
             state.position = p;
