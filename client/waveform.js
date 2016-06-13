@@ -1,6 +1,5 @@
 const pixelRatio = window.devicePixelRatio || screen.deviceXDPI / screen.logicalXDPI;
 const minPxPerSec = 20;
-const waveColor = "#fefbf6";
 const normalize = false;
 
 function processAudioFile(audioFile, doneFn) {
@@ -19,7 +18,7 @@ function _processAudioFile(audioData, doneFn) {
     });
 }
 
-function getWaveformDataURI(peaks, duration) {
+function getWaveformDataURI(peaks, duration, waveColor) {
     let canvasElement = document.createElement('canvas');
     let canvasCtx = canvasElement.getContext('2d');
 
@@ -27,7 +26,7 @@ function getWaveformDataURI(peaks, duration) {
     canvasElement.width = width;
     canvasElement.height = 128;
 
-    drawPeaks(canvasCtx, peaks, width);
+    drawPeaks(canvasCtx, peaks, width, waveColor);
     return canvasElement.toDataURL();
 }
 
@@ -76,7 +75,7 @@ function getPeaks(audioBuffer, length, splitChannels=false) {
     return splitChannels ? splitPeaks : mergedPeaks;
 }
 
-function drawPeaks(canvasCtx, peaks, width, splitChannels=false, channelIndex=0) {
+function drawPeaks(canvasCtx, peaks, width, waveColor, splitChannels=false, channelIndex=0) {
     // Split channels
     /*
        if (peaks[0] instanceof Array) {

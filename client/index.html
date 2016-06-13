@@ -268,7 +268,7 @@ window.addEventListener("load", () => {
         duration.dataset.value = data.duration;
 
         new Promise( (resolve) => {
-            resolve(getWaveformDataURI(data.waveformURI, data.duration));
+            resolve(getWaveformDataURI(data.waveformURI, data.duration, "#fefbf6"));
         }).then( (datauri) => {
             waveformURI.style.backgroundImage = "url(" + datauri + ")";
         });
