@@ -497,6 +497,7 @@ window.addEventListener("load", () => {
         let promptedTheUser = new Promise((resolve, reject) => {
             okButton.onclick = () => {
                 metadata.fileName = fileNameInput.value; // xxx sanitize...
+                Avgrund.hide("#uploadAndShareModal");
                 resolve(true);
             };
             cancelButton.onclick = () => {
@@ -515,7 +516,7 @@ window.addEventListener("load", () => {
         });
 
         let seededTheTorrent = new Promise((resolve, reject) => {
-            seederClient.seed(files, (torrent) => {
+            seederClient.seed(files[0], (torrent) => {
                 console.log("seederClient.seed done")
                 metadata.magnetURI = torrent.magnetURI
                 resolve(true);
