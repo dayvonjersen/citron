@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"html"
 	"io"
 	"log"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -43,7 +45,13 @@ func getFileHash(magnet string) (string, error) {
 		return "", fmt.Errorf("invalid magnet: invalid urn")
 	}
 
-	return urn[9:], nil
+	hash := urn[9:]
+
+	if m, _ := regexp.Match(`^[0-9A-Fa-f]{40}$`, []byte(hash)); !m {
+		return "", fmt.Errorf("invalid magnet: invalid hash")
+	}
+
+	return hash, nil
 }
 
 var pubsubhubbub chan string
@@ -100,6 +108,10 @@ func index(w http.ResponseWriter, r *http.Request) {
 			case nil:
 
 				// validate structure ...
+				s.FileName = html.EscapeString(s.FileName)
+				if len(s.FileName) > 255 {
+					s.FileName = s.FileName[:255]
+				}
 
 				hash, err := getFileHash(s.MagnetURI)
 				if err != nil {
