@@ -84,6 +84,8 @@
                 knob
             -->
             <input type="range" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
+            <span style="float:right" title="upload speed">&uarr; <span class="clientUpload">0 B/s</span></span>
+            <span style="float:right" title="download speed">&darr; <span class="clientDownload">0 B/s</span></span>
         </footer>
 
         <!--
@@ -602,6 +604,24 @@ window.addEventListener("load", () => {
     //
     // gimmicks
     //
+
+    // ul/dl speeds
+    let clientUpload = document.querySelector('.clientUpload');
+    let clientDownload = document.querySelector('.clientDownload');
+    let formatBytes = (b) => {
+        b |= 0;
+        let u = '';
+        switch(true) {
+        case (b >= 1000 && b < 1000000): u = 'K'; b/=1000; break;
+        case (b >= 1000000 && b < 1000000000): u = 'M'; b/=1000000; break;
+        case (b > 1000000000): u = 'G'; b/=1000000000; break;
+        }
+        return `${b.toPrecision(3).replace(/[0\.]+$/,'') || "0"} ${u}B/s`;
+    };
+    setInterval(() => {
+        clientUpload.innerHTML = formatBytes(client.uploadSpeed);
+        clientDownload.innerHTML = formatBytes(client.downloadSpeed);
+    }, 1000);
 
     // keeps timestamps up-to-date, e.g. "5 minutes ago" actually being true
     setInterval(() => {
