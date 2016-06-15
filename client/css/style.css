@@ -131,7 +131,7 @@ footer hr {
     height: 128px;
     cursor: pointer;
 }
-/*.citrus__suprême-waveform-column*/ .not-playing .waveformBox {
+/*.waveformBox*/.not-loaded  {
     filter: grayscale(1) opacity(0.5);
     -webkit-filter: grayscale(1) opacity(0.5);
 }

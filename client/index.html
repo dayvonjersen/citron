@@ -95,7 +95,7 @@
                             <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M45,72.4H33V27.2h12V72.4z M67,72.4H55 V27.2h12V72.4z"/>
                         </svg>
                     </div>
-                    <div class="citrus__suprême-waveform-column not-playing">
+                    <div class="citrus__suprême-waveform-column">
                         <h1 class="citrus__suprême-title">
                             <a href="#" class="magnetURI">
                                 <img src="magnet.svg">
@@ -103,7 +103,7 @@
                             </a>
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
-                        <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
+                        <div class="waveformBox not-loaded" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
                             <!-- left: position + "%"; -->
                             <div data-style-property="left" style="position:absolute;left:0%;height:100%;">
                                 <div class="slider"></div>
@@ -269,7 +269,7 @@ window.addEventListener("load", () => {
                 childElement.style[childElement.dataset.styleProperty] = pos+"%";
             });
 
-            containerElement.dispatchEvent(new Event("update", {detail:{event:e,position:state.position}}));
+            if("undefined" !== typeof e)  containerElement.dispatchEvent(new Event("update"));
         };
 
         function takeoffeveryZig(e) {
@@ -338,7 +338,7 @@ window.addEventListener("load", () => {
             state.isDragging = false;
             state.x = NaN;
             state.y = NaN;
-            updatePosition(e);
+            updatePosition();
         };
 
         function youknowwhatyoudoing(e) {
@@ -363,6 +363,7 @@ window.addEventListener("load", () => {
             state.position = p;
             updatePosition();
         };
+        containerElement.getPosition = () => state.position;
     };
 
     // attaches new segments 
@@ -407,6 +408,7 @@ window.addEventListener("load", () => {
             if(!audioElement) {
                 client.add(magnetURI, (torrent) => {
                     torrent.files[0].appendTo(`#${uuid}`, (err, audioElement) => {
+                        waveformBoxElement.classList.remove("not-loaded");
                         if(err) {
                             errorMessage(err.message);
                             return;
@@ -414,26 +416,22 @@ window.addEventListener("load", () => {
                         audioElement.addEventListener("timeupdate", () => {
                             waveformBoxElement.setPosition(audioElement.currentTime / duration);
                         });
-                        waveformBoxElement.addEventListener("update", (e) => {
-                            if(typeof e.detail.event !== "undefined") {
-                                audioElement.currentTime = duration * e.detail.position;
-                            }
+                        waveformBoxElement.addEventListener("update", () => {
+                           audioElement.currentTime = duration * waveformBoxElement.getPosition();
                         });
                     });
                 });
             } else {
                 if(audioElement.paused) {
                     audioElement.play();
-                    waveformBoxElement.classList.remove("not-playing");
                 } else {
                     audioElement.pause();
-                    waveformBoxElement.classList.add("not-playing");
                 }
             }        
         });
  
-        fileName.innerHTML = data.fileName;
-        magnetURI.href = data.magnetURI;
+        fileNameElement.innerHTML = fileName;
+        magnetURIElement.href = magnetURI;
 
         let createdAtDate = new Date(createdAt);
         createdAtElement.innerHTML = fdate(createdAtDate);
