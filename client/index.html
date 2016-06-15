@@ -415,6 +415,7 @@ window.addEventListener("load", () => {
                     articleElement.classList.remove("citrus__suprême--paused");
                     articleElement.classList.remove("citrus__suprême--not-loaded");
                     articleElement.classList.remove("citrus__suprême--loading");
+                    waveformBoxElement.disabled = false;
                     if(err) {
                         errorMessage(err.message);
                         return;
@@ -470,6 +471,7 @@ window.addEventListener("load", () => {
             waveformBoxElement.querySelector('.waveform--yellow').src = waveformImages.yellow;
             waveformBoxElement.querySelector('.waveform--black').src  = waveformImages.black;
             inAD2101WarWasBeginning(waveformBoxElement);
+            waveformBoxElement.disabled = true;
         });
 
         mainElement.appendChild(tpl);

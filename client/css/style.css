@@ -231,6 +231,6 @@ button.cbutton.cbutton--effect-sanja {
 }
 
 .citrus__suprême-playpause-button.loading {
-    animation: 1s pulse ease-in-out infinite;
-    -webkit-animation: 1s pulse ease-in-out infinite;
+    animation: 1s pulse cubic-bezier(0.85, -0.01, 0, 0.96) infinite;
+    -webkit-animation: 1s pulse cubic-bezier(0.85, -0.01, 0, 0.96) infinite;
 }
