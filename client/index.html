@@ -101,7 +101,6 @@
                                 <img src="magnet.svg">
                                 <span class="fileName"></span>
                             </a>
-                            <!-- <span>The Untitleds &mdash; &ldquo;Lorem Ipsum&rdquo;</span> -->
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
                         <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
@@ -142,7 +141,7 @@
                 <input autofocus required placeholder="DJ Unknown - &quot;untitled (unReleased Mix)&quot;" name="fileName">
                 <!-- <textarea disabled placeholder="shout out to you, i'm sending a shoutout to all the mofherf** in them after-hour spots..."></textarea> -->
                 <!-- <input disabled placeholder="#yoloswag"> -->
-                <div style="display:flex;font-weight:bold">
+                <div style="display:flex">
                     <button class="ok cbutton cbutton--effect-sanja">OK</button>
                     <button class="cancel cbutton cbutton--effect-sanja">Cancel</button>
                 </div>
@@ -262,13 +261,15 @@ window.addEventListener("load", () => {
             position: 0
         };
 
-        function updatePosition() {
+        function updatePosition(e) {
             if(containerElement.disabled) return;
 
             [].forEach.call(containerElement.querySelectorAll("[data-style-property]"), function(childElement) {
                 var pos = (childElement.dataset.invertPosition ? state.position - 1 : state.position).toPrecision(6) * 100;
                 childElement.style[childElement.dataset.styleProperty] = pos+"%";
             });
+
+            containerElement.dispatchEvent(new Event("update", {detail:{event:e,position:state.position}}));
         };
 
         function takeoffeveryZig(e) {
@@ -325,7 +326,7 @@ window.addEventListener("load", () => {
 
             const rect = containerElement.getBoundingClientRect();
             state.position = Math.max(Math.min( ((pageX - rect.left) / rect.width) , 1), 0);
-            updatePosition();
+            updatePosition(e);
         };
 
         function forgreatJustice() {    
@@ -337,7 +338,7 @@ window.addEventListener("load", () => {
             state.isDragging = false;
             state.x = NaN;
             state.y = NaN;
-            updatePosition();
+            updatePosition(e);
         };
 
         function youknowwhatyoudoing(e) {
@@ -377,68 +378,80 @@ window.addEventListener("load", () => {
         }
     };
 
-    let leecherClient = new WebTorrent();                        
+    let client = new WebTorrent();                        
     let addChild = (data) => {
+
+        let fileName = data.fileName;
+        let magnetURI = data.magnetURI;
+        let waveformURI = data.waveformURI;
+        let duration = data.duration;
+        let createdAt = data.createdAt;
 
         let tpl = getTemplate("suprême");
 
-        let fileName = tpl.querySelector('.fileName');
-        let magnetURI = tpl.querySelector('.magnetURI');
-        let waveformURI = tpl.querySelector('.waveformURI');
-        let duration = tpl.querySelector('.duration');
-        let createdAt = tpl.querySelector('.createdAt');
-        let playbutton = tpl.querySelector('.play'); 
-        let waveformBox = tpl.querySelector('.waveformBox');
-/*
-        playbutton.addEventListener("click", (function(magnetURI){
-            return (evt) => {
-                leecherClient.add(magnetURI, (torrent) => {
-                    torrent.files[0].appendTo(`#${uuid}`);
-                    
-                    waveformBox.dataset.disabled = false;
+        let articleElement = tpl.querySelector('article');
+        let fileNameElement = tpl.querySelector('.fileName');
+        let magnetURIElement = tpl.querySelector('.magnetURI');
+        let waveformURIElement = tpl.querySelector('.waveformURI');
+        let durationElement = tpl.querySelector('.duration');
+        let createdAtElement = tpl.querySelector('.createdAt');
+        let playpauseElement = tpl.querySelector('.citrus__suprême-playpause-column'); 
+        let waveformBoxElement = tpl.querySelector('.waveformBox');
+
+        let uuid = uniqid();
+        articleElement.setAttribute("id", uuid);
+
+        playpauseElement.addEventListener("click", (evt) => {
+            articleElement.classList.toggle("citrus__suprême--paused");
+            let audioElement = articleElement.querySelector("audio");
+            if(!audioElement) {
+                client.add(magnetURI, (torrent) => {
+                    torrent.files[0].appendTo(`#${uuid}`, (err, audioElement) => {
+                        if(err) {
+                            errorMessage(err.message);
+                            return;
+                        }
+                        audioElement.addEventListener("timeupdate", () => {
+                            waveformBoxElement.setPosition(audioElement.currentTime / duration);
+                        });
+                        waveformBoxElement.addEventListener("update", (e) => {
+                            if(typeof e.detail.event !== "undefined") {
+                                audioElement.currentTime = duration * e.detail.position;
+                            }
+                        });
+                    });
                 });
-            };
-            })(data.magnetURI) );
-            */
-
-        // xxx
-        var tmp = tpl.querySelector('article');
-        playbutton.addEventListener("click", () => {
-            tmp.classList.toggle("citrus__suprême--paused");
-            return;
-            var audioElement = document.createElement("audio");
-            audioElement.controls = 1;
-            audioElement.src = encodeURI("the bf project - Onion Dear.ogg");
-            audioElement.addEventListener("timeupdate", () => {
-                waveformBox.setPosition(audioElement.currentTime / data.duration);
-            });
-            tmp.appendChild(audioElement);
-            waveformBox.disabled = false;
-            audioElement.play();
+            } else {
+                if(audioElement.paused) {
+                    audioElement.play();
+                    waveformBoxElement.classList.remove("not-playing");
+                } else {
+                    audioElement.pause();
+                    waveformBoxElement.classList.add("not-playing");
+                }
+            }        
         });
-
+ 
         fileName.innerHTML = data.fileName;
         magnetURI.href = data.magnetURI;
 
-        let created = new Date(data.createdAt);
-        createdAt.innerHTML = fdate(created);
-        createdAt.dataset.value = data.createdAt;
-        createdAt.setAttribute("title", created.toLocaleString());
+        let createdAtDate = new Date(createdAt);
+        createdAtElement.innerHTML = fdate(createdAtDate);
+        createdAtElement.dataset.value = createdAt;
+        createdAtElement.setAttribute("title", createdAtDate.toLocaleString());
 
-        duration.innerHTML = fduration(data.duration);
-        duration.dataset.value = data.duration;
+        durationElement.innerHTML = fduration(duration);
+        durationElement.dataset.value = duration;
 
-        new Promise( (resolve) => {
+        new Promise((resolve) => {
             resolve({
-                yellow: getWaveformDataURI(data.waveformURI, data.duration, "#fef200"),
-                black:  getWaveformDataURI(data.waveformURI, data.duration, "#1e181a")
+                yellow: getWaveformDataURI(waveformURI, duration, "#fef200"),
+                black:  getWaveformDataURI(waveformURI, duration, "#1e181a")
             });
-        }).then( (waveformImages) => {
-
-            waveformBox.querySelector('.waveform--yellow').src = waveformImages.yellow;
-            waveformBox.querySelector('.waveform--black').src = waveformImages.black;         
-            
-            inAD2101WarWasBeginning(waveformBox);
+        }).then((waveformImages) => {
+            waveformBoxElement.querySelector('.waveform--yellow').src = waveformImages.yellow;
+            waveformBoxElement.querySelector('.waveform--black').src  = waveformImages.black;
+            inAD2101WarWasBeginning(waveformBoxElement);
         });
 
         mainElement.appendChild(tpl);
@@ -472,8 +485,6 @@ window.addEventListener("load", () => {
     //
     // magic
     //
-
-    let seederClient = new WebTorrent();
 
     const validMimetypes = /^audio\/(x\-)?((mp((e)?g(audio|3)?|3))|wav|ogg)$/;
 
@@ -530,7 +541,9 @@ window.addEventListener("load", () => {
         });
 
         let seededTheTorrent = new Promise((resolve, reject) => {
-            seederClient.seed(files[0], (torrent) => {
+            client.seed(files[0], (torrent) => {
+                torrent.on('error', (err) => errorMessage(err.message));
+                torrent.on('warning', (err) => errorMessage(err.message));
                 console.log("seederClient.seed done")
                 metadata.magnetURI = torrent.magnetURI
                 resolve(true);
@@ -548,7 +561,6 @@ window.addEventListener("load", () => {
 
     let uploadFile = document.querySelector("input[type='file']");
     uploadFile.onchange = () => doUpload(uploadFile.files);    
-
     DragDrop('html', (files) => doUpload(files));
 
     //

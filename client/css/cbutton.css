@@ -1,4 +1,5 @@
 .cbutton {
+    font-weight: bold;
     cursor: pointer;
 	position: relative;
 	display: inline-block;
