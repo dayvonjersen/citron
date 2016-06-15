@@ -34,6 +34,11 @@
         -->
         <link rel="stylesheet" href="css/cbutton.css">
 
+        <!--
+            ana tudor!
+        -->
+        <link rel="stylesheet" href="css/input-type-range.css">
+        <script src="input-type-range.js"></script>
     </head>
     <body>
         <header>
@@ -72,10 +77,9 @@
             </div>
         </header>
 
-        <main class="avgrund-contents">Loading...</main>
+        <main class="avgrund-contents"><center>Loading...</center></main>
 
         <footer>
-            <hr>
             <!--
                 knob
             -->
@@ -372,6 +376,7 @@ window.addEventListener("load", () => {
 
     let mainElement = document.querySelector("main");
     let volumeElement = document.querySelector("input[type='range']");
+    initInputRange(volumeElement);
     let previousVolume = volumeElement.value;
     // XXX only global for debugging
     window.client = new WebTorrent();
