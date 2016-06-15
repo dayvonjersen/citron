@@ -85,7 +85,7 @@
             suprême
         -->
         <template id="suprême">
-            <article class="citrus__suprême citrus__suprême--paused">
+            <article class="citrus__suprême citrus__suprême--paused citrus__suprême--not-loaded">
                 <div class="citrus__suprême-inner-row">
                     <div class="citrus__suprême-playpause-column">
                         <svg class="citrus__suprême-playpause-button play" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg" >
@@ -93,6 +93,11 @@
                         </svg>
                         <svg class="citrus__suprême-playpause-button pause" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                             <path d="M50,0C22.4,0,0,22.4,0,50s22.4,50,50,50s50-22.4,50-50S77.6,0,50,0z M45,72.4H33V27.2h12V72.4z M67,72.4H55 V27.2h12V72.4z"/>
+                        </svg>
+                        <svg class="citrus__suprême-playpause-button loading" viewBox="0 0 32 32" version="1.1" x="0px" y="0px" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(0,-1020.3622)">
+                                <path d="M 16 0 A 16 16 0 0 0 0 16 A 16 16 0 0 0 16 32 A 16 16 0 0 0 32 16 A 16 16 0 0 0 16 0 z M 11.400391 14.849609 A 1.15 1.15 0 0 1 12.550781 16 A 1.15 1.15 0 0 1 11.400391 17.150391 A 1.15 1.15 0 0 1 10.25 16 A 1.15 1.15 0 0 1 11.400391 14.849609 z M 16 14.849609 A 1.15 1.15 0 0 1 17.150391 16 A 1.15 1.15 0 0 1 16 17.150391 A 1.15 1.15 0 0 1 14.849609 16 A 1.15 1.15 0 0 1 16 14.849609 z M 20.599609 14.849609 A 1.15 1.15 0 0 1 21.75 16 A 1.15 1.15 0 0 1 20.599609 17.150391 A 1.15 1.15 0 0 1 19.449219 16 A 1.15 1.15 0 0 1 20.599609 14.849609 z" transform="translate(0,1020.3622)" fill-opacity="1" fill-rule="evenodd"/>
+                            </g>
                         </svg>
                     </div>
                     <div class="citrus__suprême-waveform-column">
@@ -103,7 +108,7 @@
                             </a>
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
-                        <div class="waveformBox not-loaded" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
+                        <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
                             <!-- left: position + "%"; -->
                             <div data-style-property="left" style="position:absolute;left:0%;height:100%;">
                                 <div class="slider"></div>
@@ -379,7 +384,7 @@ window.addEventListener("load", () => {
         }
     };
 
-    let client = new WebTorrent();                        
+    window.client = new WebTorrent();                        
     let addChild = (data) => {
 
         let fileName = data.fileName;
@@ -403,29 +408,44 @@ window.addEventListener("load", () => {
         articleElement.setAttribute("id", uuid);
 
         playpauseElement.addEventListener("click", (evt) => {
-            articleElement.classList.toggle("citrus__suprême--paused");
             let audioElement = articleElement.querySelector("audio");
             if(!audioElement) {
-                client.add(magnetURI, (torrent) => {
-                    torrent.files[0].appendTo(`#${uuid}`, (err, audioElement) => {
-                        waveformBoxElement.classList.remove("not-loaded");
-                        if(err) {
-                            errorMessage(err.message);
-                            return;
-                        }
-                        audioElement.addEventListener("timeupdate", () => {
-                            waveformBoxElement.setPosition(audioElement.currentTime / duration);
-                        });
-                        waveformBoxElement.addEventListener("update", () => {
-                           audioElement.currentTime = duration * waveformBoxElement.getPosition();
-                        });
+                articleElement.classList.add("citrus__suprême--loading");
+                let readyFn = (err, audioElement) => {
+                    articleElement.classList.remove("citrus__suprême--paused");
+                    articleElement.classList.remove("citrus__suprême--not-loaded");
+                    articleElement.classList.remove("citrus__suprême--loading");
+                    if(err) {
+                        errorMessage(err.message);
+                        return;
+                    }
+                    audioElement.addEventListener("timeupdate", () => {
+                        waveformBoxElement.setPosition(audioElement.currentTime / duration);
                     });
-                });
-            } else {
+                    waveformBoxElement.addEventListener("update", () => {
+                        audioElement.currentTime = duration * waveformBoxElement.getPosition();
+                    });
+                };
+                let loaded = false;
+                for(let i = 0; i < client.torrents.length; i++) {
+                    if(client.torrents[i].magnetURI === magnetURI) {
+                        client.torrents[i].files[0].appendTo(`#${uuid}`, readyFn);
+                        loaded = true;
+                        break;
+                    }
+                } 
+                if(!loaded) {
+                    client.add(magnetURI, (torrent) => {
+                        torrent.files[0].appendTo(`#${uuid}`, readyFn);
+                    });
+                }
+            } else if(!waveformBoxElement.classList.contains("not-loaded")) {
                 if(audioElement.paused) {
                     audioElement.play();
+                    articleElement.classList.remove("citrus__suprême--paused");
                 } else {
                     audioElement.pause();
+                    articleElement.classList.add("citrus__suprême--paused");
                 }
             }        
         });

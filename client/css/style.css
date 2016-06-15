@@ -111,7 +111,10 @@ footer hr {
 }
 
 .citrus__suprême--paused .pause,
-.citrus__suprême:not(.citrus__suprême--paused) .play {
+.citrus__suprême:not(.citrus__suprême--paused) .play,
+.citrus__suprême--loading .pause,
+.citrus__suprême--loading .play,
+.citrus__suprême:not(.citrus__suprême--loading) .loading {
     display: none;
 }
 
@@ -131,7 +134,7 @@ footer hr {
     height: 128px;
     cursor: pointer;
 }
-/*.waveformBox*/.not-loaded  {
+.citrus__suprême--not-loaded .waveformBox {
     filter: grayscale(1) opacity(0.5);
     -webkit-filter: grayscale(1) opacity(0.5);
 }
@@ -214,4 +217,20 @@ button.cbutton.cbutton--effect-sanja {
 
 .citrus__volume:hover {
     /* width: 128px; */
+}
+
+@keyframes pulse {
+    0% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
+    50% { fill: #fefbf6; box-shadow: 0 0 20px 48px rgba(254,242,0,1); transform: scale(1.5); stroke: #fef200; }
+    100% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
+}
+@-webkit-keyframes pulse {
+    0% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
+    50% { fill: #fefbf6; box-shadow: 0 0 20px 48px rgba(254,242,0,1); transform: scale(1.5); stroke: #fef200; }
+    100% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
+}
+
+.citrus__suprême-playpause-button.loading {
+    animation: 1s pulse ease-in-out infinite;
+    -webkit-animation: 1s pulse ease-in-out infinite;
 }
