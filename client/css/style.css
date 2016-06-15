@@ -131,6 +131,10 @@ footer hr {
     height: 128px;
     cursor: pointer;
 }
+/*.citrus__suprême-waveform-column*/ .not-playing .waveformBox {
+    filter: grayscale(1) opacity(0.5);
+    -webkit-filter: grayscale(1) opacity(0.5);
+}
 
 .citrus__suprême-info {
     position: absolute;
@@ -139,10 +143,11 @@ footer hr {
 }
 
 .citrus__suprême-info > * {
-    background: rgba(30, 24, 26, 0.41);
+    background: rgba(30, 24, 26, 0.92);
     color: #fefbf6;
     padding: 2px 4px;
     margin-left: 0.5em;
+    vertical-align: top;
 }
 
 .citrus__suprême .torrent {
