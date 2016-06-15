@@ -12,7 +12,7 @@ input[type='range'], input[type='range']::-webkit-slider-runnable-track, input[t
 input[type='range']::-webkit-slider-runnable-track {
   margin: 0 0.75em;
   border: none;
-  padding: 0 0.125em;
+  padding: 0;
   width: 10em;
   height: 0.25em;
   border-radius: 0.125em;
