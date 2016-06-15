@@ -119,6 +119,7 @@ footer hr {
     font-size: 12px;
     float: right;
     color: rgba(30, 24, 26, 0.41);
+    cursor: help;
 }
 
 .citrus__suprême-waveform-column {
@@ -131,18 +132,48 @@ footer hr {
     cursor: pointer;
 }
 
-/*time*/.citrus__suprême-duration-time {
-    position:absolute;
-    right:0;
-    bottom:0;
-    background:rgba(30, 24, 26, 0.41);
-    color:#fefbf6;
+.citrus__suprême-info {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
+
+.citrus__suprême-info > * {
+    background: rgba(30, 24, 26, 0.41);
+    color: #fefbf6;
     padding: 2px 4px;
+    margin-left: 0.5em;
+}
+
+.citrus__suprême .torrent {
+    opacity: 0;
+    transition: opacity 0.5s ease-out 0.5s;
+}
+.citrus__suprême:hover .torrent {
+    opacity: 1;
 }
 
 /*h1*/.citrus__suprême-title {
     font-size: 26px;
     margin-bottom: 2px;
+    position: relative;
+}
+.citrus__suprême-title a {
+    text-decoration: none;
+}
+.citrus__suprême-title img {
+    position: absolute;
+    left: -1em;
+    top: 12.5%;
+    width:1em;
+    height:1em;
+    opacity: 0;
+}
+.citrus__suprême-title:hover a {
+    text-decoration: underline;
+}
+.citrus__suprême-title:hover img {
+    opacity: 1;
 }
 
 /**
@@ -179,4 +210,3 @@ button.cbutton.cbutton--effect-sanja {
 .citrus__volume:hover {
     /* width: 128px; */
 }
-

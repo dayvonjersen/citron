@@ -97,9 +97,11 @@
                     </div>
                     <div class="citrus__suprême-waveform-column not-playing">
                         <h1 class="citrus__suprême-title">
-                            <span class="fileName"></span>
+                            <a href="#" class="magnetURI">
+                                <img src="magnet.svg">
+                                <span class="fileName"></span>
+                            </a>
                             <!-- <span>The Untitleds &mdash; &ldquo;Lorem Ipsum&rdquo;</span> -->
-                            <!-- <span class="links-n-stuff"><img style="display:inline;width:30px;height:30px;" src="magnet.svg">| 0 seeders | 35 leechers</span> -->
                             <time class="citrus__suprême-createdat-time createdAt" data-value></time>
                         </h1>
                         <div class="waveformBox" style="position:relative;overflow:hidden;white-space:nowrap;width:100%">
@@ -128,7 +130,7 @@
                         </div>
                     </div>
                 </div>
-                <time class="citrus__suprême-duration-time duration" data-value></time>
+                <div class="citrus__suprême-info"><small class="torrent">(0 peers online)</small><time class="duration" data-value></time></div>
             </article>
         </template>
 
@@ -140,7 +142,7 @@
                 <input autofocus required placeholder="DJ Unknown - &quot;untitled (unReleased Mix)&quot;" name="fileName">
                 <!-- <textarea disabled placeholder="shout out to you, i'm sending a shoutout to all the mofherf** in them after-hour spots..."></textarea> -->
                 <!-- <input disabled placeholder="#yoloswag"> -->
-                <div style="display:flex">
+                <div style="display:flex;font-weight:bold">
                     <button class="ok cbutton cbutton--effect-sanja">OK</button>
                     <button class="cancel cbutton cbutton--effect-sanja">Cancel</button>
                 </div>
@@ -365,13 +367,23 @@ window.addEventListener("load", () => {
     // attaches new segments 
     //xxx: needs some love
     let mainElement = document.querySelector("main");
+
+    // belongs in gimmicks:
+    mainElement.onscroll = () => {
+        if(mainElement.scrollTop === 0) {
+            mainElement.style.boxShadow = "none";
+        } else {
+            mainElement.style.boxShadow = "0px 10px 10px -5px rgb(204, 204, 204) inset";
+        }
+    };
+
     let leecherClient = new WebTorrent();                        
     let addChild = (data) => {
 
         let tpl = getTemplate("suprême");
 
         let fileName = tpl.querySelector('.fileName');
-        //let magnetURI = tpl.querySelector('.magnetURI');
+        let magnetURI = tpl.querySelector('.magnetURI');
         let waveformURI = tpl.querySelector('.waveformURI');
         let duration = tpl.querySelector('.duration');
         let createdAt = tpl.querySelector('.createdAt');
@@ -406,10 +418,12 @@ window.addEventListener("load", () => {
         });
 
         fileName.innerHTML = data.fileName;
+        magnetURI.href = data.magnetURI;
 
         let created = new Date(data.createdAt);
         createdAt.innerHTML = fdate(created);
         createdAt.dataset.value = data.createdAt;
+        createdAt.setAttribute("title", created.toLocaleString());
 
         duration.innerHTML = fduration(data.duration);
         duration.dataset.value = data.duration;
