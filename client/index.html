@@ -16,6 +16,7 @@
         -->
         <script src="dragdrop.min.js" async></script>
         <script src="webtorrent.min.js" async></script>
+        <script src="keymaster.min.js" async></script>
 
         <!--
             MORE JS
@@ -253,7 +254,6 @@ window.addEventListener("load", () => {
     });
 
     // waveform box
-    // (useful comment, I know)
     let inAD2101WarWasBeginning = (containerElement) => {
         const minDistance = 0;
         const maxAngle = Infinity;
@@ -361,30 +361,22 @@ window.addEventListener("load", () => {
 
         // set position to 0 on init
         updatePosition();
-        // disable on first run, adding audio element enables
-        //containerElement.disabled = true;
-        // provide hook to update position
+
+        // provide hooks to get/set position externally
+        containerElement.getPosition = () => state.position;
         containerElement.setPosition = (p) => {
             state.position = p;
             updatePosition();
         };
-        containerElement.getPosition = () => state.position;
     };
 
-    // attaches new segments 
-    //xxx: needs some love
     let mainElement = document.querySelector("main");
+    let volumeElement = document.querySelector("input[type='range']");
+    let previousVolume = volumeElement.value;
+    // XXX only global for debugging
+    window.client = new WebTorrent();
 
-    // belongs in gimmicks:
-    mainElement.onscroll = () => {
-        if(mainElement.scrollTop === 0) {
-            mainElement.style.boxShadow = "none";
-        } else {
-            mainElement.style.boxShadow = "0px 10px 10px -5px rgb(204, 204, 204) inset";
-        }
-    };
-
-    window.client = new WebTorrent();                        
+    // audio files
     let addChild = (data) => {
 
         let fileName = data.fileName;
@@ -409,6 +401,12 @@ window.addEventListener("load", () => {
 
         playpauseElement.addEventListener("click", (evt) => {
             let audioElement = articleElement.querySelector("audio");
+            [].forEach.call(document.querySelectorAll("audio"), (otherAudioElement) => {
+                if(!!audioElement && otherAudioElement !== audioElement) {
+                    otherAudioElement.pause();
+                    otherAudioElement.removeAttribute("selected");
+                }
+            });
             if(!audioElement) {
                 articleElement.classList.add("citrus__suprême--loading");
                 let readyFn = (err, audioElement) => {
@@ -420,9 +418,23 @@ window.addEventListener("load", () => {
                         errorMessage(err.message);
                         return;
                     }
+
+                    audioElement.setAttribute("selected","");
+
+                    audioElement.volume = volumeElement.value / 100;
+                    volumeElement.addEventListener("input", () => audioElement.volume = volumeElement.value / 100);
+
+                    audioElement.addEventListener("pause", () => {
+                        articleElement.classList.add("citrus__suprême--paused");
+                    });
+                    audioElement.addEventListener("play", () => {
+                        articleElement.classList.remove("citrus__suprême--paused")
+                    });
+
                     audioElement.addEventListener("timeupdate", () => {
                         waveformBoxElement.setPosition(audioElement.currentTime / duration);
                     });
+
                     waveformBoxElement.addEventListener("update", () => {
                         audioElement.currentTime = duration * waveformBoxElement.getPosition();
                     });
@@ -441,12 +453,11 @@ window.addEventListener("load", () => {
                     });
                 }
             } else if(!waveformBoxElement.classList.contains("not-loaded")) {
+                audioElement.setAttribute("selected","");
                 if(audioElement.paused) {
                     audioElement.play();
-                    articleElement.classList.remove("citrus__suprême--paused");
                 } else {
                     audioElement.pause();
-                    articleElement.classList.add("citrus__suprême--paused");
                 }
             }        
         });
@@ -503,7 +514,7 @@ window.addEventListener("load", () => {
     }
 
     //
-    // magic
+    // add torrents
     //
 
     const validMimetypes = /^audio\/(x\-)?((mp((e)?g(audio|3)?|3))|wav|ogg)$/;
@@ -612,6 +623,51 @@ window.addEventListener("load", () => {
         }
         document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(title.codePointAt(0))));
     }, 250);
+
+    // box shadows on headers are mandatory in 2016
+    mainElement.onscroll = () => {
+        if(mainElement.scrollTop === 0) {
+            mainElement.style.boxShadow = "none";
+        } else {
+            mainElement.style.boxShadow = "0px 10px 10px -5px rgb(204, 204, 204) inset";
+        }
+    };
+
+    //
+    // common keyboard shortcuts
+    //
+    key('space', (e) => {
+        e.preventDefault();
+        let audioElement = document.querySelector("audio[selected]");
+        if(audioElement) {
+            audioElement.paused ? audioElement.play() : audioElement.pause();
+        }
+    });
+    key('s,esc', (e) => {
+        e.preventDefault();
+        let audioElement = document.querySelector("audio[selected]");
+        if(audioElement) {
+            audioElement.currentTime = 0;
+            audioElement.pause();
+        }
+    });
+    key('m', () => {
+        if(volumeElement.value|0) {
+            previousVolume = volumeElement.value|0;
+            volumeElement.value = 0;
+        } else {
+            volumeElement.value = previousVolume;
+        }
+        volumeElement.dispatchEvent(new Event("input"));
+    });
+    key('up', () => {
+        volumeElement.value = Math.min(100, (volumeElement.value|0)+5);
+        volumeElement.dispatchEvent(new Event("input"));
+    });
+    key('down', () => {
+        volumeElement.value = Math.max(0, (volumeElement.value|0)-5);
+        volumeElement.dispatchEvent(new Event("input"));
+    });
 });
         </script>
     </body>

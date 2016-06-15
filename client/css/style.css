@@ -220,14 +220,14 @@ button.cbutton.cbutton--effect-sanja {
 }
 
 @keyframes pulse {
-    0% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
-    50% { fill: #fefbf6; box-shadow: 0 0 20px 48px rgba(254,242,0,1); transform: scale(1.5); stroke: #fef200; }
-    100% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
+    0% { fill: #fef200;  transform: scale(1); stroke: #fefbf6; }
+    50% { fill: #fefbf6;  transform: scale(1.5); stroke: #fef200; }
+    100% { fill: #fef200;  transform: scale(1); stroke: #fefbf6; }
 }
 @-webkit-keyframes pulse {
-    0% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
-    50% { fill: #fefbf6; box-shadow: 0 0 20px 48px rgba(254,242,0,1); transform: scale(1.5); stroke: #fef200; }
-    100% { fill: #fef200; box-shadow: 0 0 0 0 #fefbf6; transform: scale(1); stroke: #fefbf6; }
+    0% { fill: #fef200;  transform: scale(1); stroke: #fefbf6; }
+    50% { fill: #fefbf6;  transform: scale(1.5); stroke: #fef200; }
+    100% { fill: #fef200;  transform: scale(1); stroke: #fefbf6; }
 }
 
 .citrus__suprême-playpause-button.loading {
