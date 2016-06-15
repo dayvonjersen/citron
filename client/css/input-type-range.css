@@ -39,7 +39,7 @@ input[type='range']::-ms-track {
 input[type='range']::-webkit-slider-thumb {
   margin-top: -0.625em;
   box-sizing: border-box;
-  border: solid 0.25em #fefbf6;
+  border: solid 0.25em transparent;
   width: 1.5em;
   height: 1.5em;
   border-radius: 50%;
@@ -48,7 +48,7 @@ input[type='range']::-webkit-slider-thumb {
 }
 input[type='range']::-moz-range-thumb {
   box-sizing: border-box;
-  border: solid 0.25em #fefbf6;
+  border: solid 0.25em transparent;
   width: 1.5em;
   height: 1.5em;
   border-radius: 50%;
@@ -58,7 +58,7 @@ input[type='range']::-moz-range-thumb {
 }
 input[type='range']::-ms-thumb {
   box-sizing: border-box;
-  border: solid 0.25em #fefbf6;
+  border: solid 0.25em transparent;
   width: 1.5em;
   height: 1.5em;
   border-radius: 50%;
@@ -108,15 +108,15 @@ input[type='range']:focus::-ms-fill-lower {
   background: #fef200;
 }
 input[type='range']:focus::-webkit-slider-thumb {
-  border: solid 0 rgba(254, 251, 246, 0);
+  border: solid 0 transparent;
   background: #fef200;
 }
 input[type='range']:focus::-moz-range-thumb {
-  border: solid 0 rgba(254, 251, 246, 0);
+  border: solid 0 transparent;
   background: #fef200;
 }
 input[type='range']:focus::-ms-thumb {
-  border: solid 0 rgba(254, 251, 246, 0);
+  border: solid 0 transparent;
   background: #fef200;
 }
 .js input[type='range']:focus /deep/ #thumb:before {
@@ -127,22 +127,6 @@ input[type='range']:focus::-ms-thumb {
   transform: translate(-50%, -3.375em) scale(1);
   opacity: .99;
 }
-input[type='range']:active::-webkit-slider-runnable-track {
-  background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box #0170c2;
-  background-size: 2em 100%;
-}
-.js input[type='range']:active::-webkit-slider-runnable-track {
-  background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box, linear-gradient(#fef200, #fef200) no-repeat #0170c2;
-  background-size: 2em 100%, 60% 100%;
-}
-input[type='range']:active::-moz-range-track {
-  background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box #0170c2;
-  background-size: 2em 100%;
-}
-.js input[type='range']:active::-moz-range-track {
-  background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box, linear-gradient(#fef200, #fef200) no-repeat #0170c2;
-  background-size: 2em 100%, 60% 100%;
-}
 input[type='range']:active::-ms-track {
   background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box #0170c2;
   background-size: 2em 100%;
@@ -152,14 +136,15 @@ input[type='range']:active::-ms-fill-lower {
   background-size: 2em 100%;
 }
 input[type='range']:active::-webkit-slider-thumb {
-  border: solid 0 rgba(254, 251, 246, 0);
+  border: solid 0 transparent;
   background: #fef200;
 }
 input[type='range']:active::-moz-range-thumb {
-  border: solid 0 rgba(254, 251, 246, 0);
+  border: solid 0 transparent;
   background: #fef200;
 }
 input[type='range']:active::-ms-thumb {
-  border: solid 0 rgba(254, 251, 246, 0);
+  border: solid 0 transparent;
   background: #fef200;
 }
+
