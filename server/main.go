@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html"
 	"io"
@@ -15,12 +16,26 @@ import (
 	"github.com/cskr/pubsub"
 )
 
+type Payload struct {
+	Event   string          `json:"event"`
+	Message json.RawMessage `json:"message"`
+}
+type PayloadGeneric struct {
+	Event   string      `json:"event"`
+	Message interface{} `json:"message"`
+}
+
 type Suprême struct {
 	FileName    string    `json:"fileName"`
 	MagnetURI   string    `json:"magnetURI"`
 	WaveformURI []float64 `json:"waveformURI"`
 	Duration    uint64    `json:"duration"`
 	CreatedAt   time.Time `json:"createdAt"`
+}
+
+type Range struct {
+	Start int `json:"start"`
+	Limit int `json:"limit"`
 }
 
 func getFileHash(magnet string) (string, error) {
@@ -62,6 +77,7 @@ func index(c *websocket.Conn) {
 
 	esc := make(chan struct{})
 	infohash := ps.Sub("infohash")
+	errors := make(chan string)
 	go func() {
 		for {
 			select {
@@ -70,61 +86,72 @@ func index(c *websocket.Conn) {
 			case h := <-infohash:
 				if hash, ok := h.(string); ok {
 					s := db.get(hash)
-					c.WriteJSON(s)
+					c.WriteJSON(&PayloadGeneric{Event: "suprême", Message: s})
 					log.Println("sent:", hash)
 				}
+			case e := <-errors:
+				c.WriteJSON(&PayloadGeneric{Event: "error", Message: e})
+				log.Println("sent:", e)
 			}
 		}
 	}()
 
-	tmp := db.getRange(0, 5)
-	db.init()
-	for _, hash := range tmp {
-		infohash <- hash
+	sendRange := func(event string, start, limit int) {
+		i := 0
+		for _, hash := range db.getRange(start, limit) {
+			s := db.get(hash)
+			c.WriteJSON(&PayloadGeneric{Event: event, Message: s})
+			i++
+		}
+		c.WriteJSON(&PayloadGeneric{Event: "loaded", Message: i})
 	}
-
-	/*
-		go func() {
-			rand.Seed(time.Now().Unix())
-			for {
-				select {
-				case <-time.After(time.Second * 2):
-					ps.Pub(tmp[rand.Intn(len(tmp))], "infohash")
-				case <-esc:
-					return
-				}
-			}
-		}()
-	*/
+	// initial load
+	sendRange("suprême", 0, 5)
 
 	go func() {
 	here:
 		for {
-			var s Suprême
-			err := c.ReadJSON(&s)
+			var p Payload
+			err := c.ReadJSON(&p)
+			log.Printf("%#v\n", p)
 			switch err {
 			case io.EOF:
 				log.Println("reader shutting down")
 				break here
 			case nil:
-				// validate structure ...
-				s.FileName = html.EscapeString(s.FileName)
-				if len(s.FileName) > 255 {
-					s.FileName = s.FileName[:255]
-				}
-				hash, err := getFileHash(s.MagnetURI)
-				if err != nil {
-					// send error message
-					log.Printf("error: %v\n", err)
-					close(esc)
-				} else {
-					s.CreatedAt = time.Now()
-					log.Println("got:", hash)
-					db.set(hash, s)
-					ps.Pub(hash, "infohash")
+				switch p.Event {
+				case "suprême":
+					var s Suprême
+					json.Unmarshal(p.Message, &s)
+					if err != nil {
+						errors <- err.Error()
+						close(esc)
+					}
+					s.FileName = html.EscapeString(s.FileName)
+					if len(s.FileName) > 255 {
+						s.FileName = s.FileName[:255]
+					}
+					hash, err := getFileHash(s.MagnetURI)
+					if err != nil {
+						errors <- err.Error()
+						close(esc)
+					} else {
+						s.CreatedAt = time.Now()
+						log.Println("got:", hash)
+						db.set(hash, s)
+						ps.Pub(hash, "infohash")
+					}
+				case "range":
+					var r Range
+					json.Unmarshal(p.Message, &r)
+					if err != nil {
+						errors <- err.Error()
+						close(esc)
+					}
+					sendRange("infinitescroll", r.Start, r.Limit)
 				}
 			default:
-				log.Printf("error: %v\n", err)
+				log.Println("error:", err)
 				close(esc)
 				break here
 			}

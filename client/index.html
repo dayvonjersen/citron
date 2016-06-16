@@ -521,6 +521,8 @@ window.addEventListener("load", () => {
     mainElement.innerHTML = "Opening websocket...";
     window.addEventListener("WebSocketReady", () => mainElement.innerHTML = "");
 
+    let isLoading = true; // used way later
+    let startIndex = 0;   // for infinite scroll , ctrl+f for "onscroll" 
     let sendPayload;
     let wsError = () => {
         errorMessage("Couldn't connect to websocket.");
@@ -535,10 +537,40 @@ window.addEventListener("load", () => {
         try {
             let ws = new WebSocket("wss://" + location.host + ":12345/");
             ws.onopen = () => {
-                sendPayload = (data) => ws.send(JSON.stringify(data));
+                sendPayload = (event,message) => {
+                    let payload = JSON.stringify({event:event,message:message});
+                    console.log(payload);
+                    ws.send(payload);
+                };
                 window.dispatchEvent(new Event("WebSocketReady"));
             };
-            ws.onmessage = (evt) => addChild(JSON.parse(evt.data));
+            ws.onmessage = (evt) => {
+                let data;
+                try {
+                    data = JSON.parse(evt.data);
+                    if(!data.event || !data.message) throw new Error();
+                } catch(e) {
+                    errorMessage("Malformed JSON response:"+JSON.stringify(evt.data));
+                }
+                if(!data) return;
+
+                switch(data.event) {
+                case "suprême":
+                    addChild(data.message);
+                    break;
+                case "infinitescroll":
+                    addChild(data.message, false);
+                    break;
+                case "loaded":
+                    isLoading = false;
+                    startIndex = data.message;
+                    break;
+                case "error":
+                    errorMessage(data.message);
+                    break;
+                // case "eof" maybe?
+                }
+            };
             ws.onerror = (evt) => wsError();
             ws.onclose = (evt) => connectWebsocket();    
         } catch(err) {
@@ -620,7 +652,7 @@ window.addEventListener("load", () => {
         Promise.all([promptedTheUser, processedTheAudioFile, seededTheTorrent]).then(() => {
             console.log("promise.all complete");
             //console.log(JSON.stringify(metadata));
-            sendPayload(metadata);
+            sendPayload("suprême",metadata);
         }, () => {
             console.log("Something happened.")
         });
@@ -680,7 +712,6 @@ window.addEventListener("load", () => {
 
     const perimeter = 400;      // "padding" or "buffer area" before absolute bottom of scroll
     let lastScrollDistance = 0;
-    let isLoading = false;
     mainElement.onscroll = () => {
         if(mainElement.scrollTop === 0) {
             mainElement.style.boxShadow = "none";
@@ -696,7 +727,7 @@ window.addEventListener("load", () => {
             && !isLoading                          // don't want to spam requests
             ) {
                 isLoading = true;
-                console.log("start loading!");
+                sendPayload("range", {start: startIndex+1, limit: 5});
             }
             lastScrollDistance = scrollDistance;
         }
