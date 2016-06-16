@@ -2,12 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html"
 	"io"
 	"log"
-	"net/url"
-	"regexp"
 	"time"
 
 	"github.com/leavengood/websocket"
@@ -16,15 +15,26 @@ import (
 	"github.com/cskr/pubsub"
 )
 
+//
+// JSON sent on both ends of the websocket takes the following form:
+//
+// {"event": (eventName), "message": (arbitraryData)}
+//
+
+// Unmarshaling into this struct lets us read the Event
+// and Unmarshal Message into the appropriate struct
 type Payload struct {
 	Event   string          `json:"event"`
 	Message json.RawMessage `json:"message"`
 }
+
+// Marshaling into this struct sends appropriately formatted data
 type PayloadGeneric struct {
 	Event   string      `json:"event"`
 	Message interface{} `json:"message"`
 }
 
+// A Suprême represents an audio
 type Suprême struct {
 	FileName    string    `json:"fileName"`
 	MagnetURI   string    `json:"magnetURI"`
@@ -33,69 +43,17 @@ type Suprême struct {
 	CreatedAt   time.Time `json:"createdAt"`
 }
 
+// A Range represents a request for more audio
 type Range struct {
 	Start int `json:"start"`
 	Limit int `json:"limit"`
 }
 
-func getFileHash(magnet string) (string, error) {
-	u, err := url.Parse(magnet)
-	if err != nil {
-		return "", err
-	}
-	if u.Scheme != "magnet" {
-		return "", fmt.Errorf("invalid magnet: url of is of scheme %s", u.Scheme)
-	}
-
-	q := u.Query()
-
-	xt, ok := q["xt"]
-	if !ok {
-		return "", fmt.Errorf("invalid magnet: missing \"xt\" parameter")
-	}
-	if len(xt) != 1 {
-		return "", fmt.Errorf("invalid magnet: invalid \"xt\" parameter")
-	}
-
-	urn := xt[0]
-	if urn[0:9] != "urn:btih:" {
-		return "", fmt.Errorf("invalid magnet: invalid urn")
-	}
-
-	hash := urn[9:]
-
-	if m, _ := regexp.Match(`^[0-9A-Fa-f]{40}$`, []byte(hash)); !m {
-		return "", fmt.Errorf("invalid magnet: invalid hash")
-	}
-
-	return hash, nil
-}
-
+// The route of the websocket
 func index(c *websocket.Conn) {
-	log.Println("----------------------------------------------")
 	defer c.Close()
 
-	esc := make(chan struct{})
-	infohash := ps.Sub("infohash")
-	errors := make(chan string)
-	go func() {
-		for {
-			select {
-			case <-esc:
-				return
-			case h := <-infohash:
-				if hash, ok := h.(string); ok {
-					s := db.get(hash)
-					c.WriteJSON(&PayloadGeneric{Event: "suprême", Message: s})
-					log.Println("sent:", hash)
-				}
-			case e := <-errors:
-				c.WriteJSON(&PayloadGeneric{Event: "error", Message: e})
-				log.Println("sent:", e)
-			}
-		}
-	}()
-
+	// is used for initial load and additional requests for infinite scroll
 	sendRange := func(event string, start, limit int) {
 		i := 0
 		for _, hash := range db.getRange(start, limit) {
@@ -105,36 +63,60 @@ func index(c *websocket.Conn) {
 		}
 		c.WriteJSON(&PayloadGeneric{Event: "loaded", Message: i})
 	}
+
 	// initial load
 	sendRange("suprême", 0, 5)
 
+	exitSender := make(chan struct{})
+	exitIndex := make(chan struct{})
+	hashChan := ps.Sub("infohash")
+	errorChan := make(chan error)
+
+	// sender
 	go func() {
-	here:
+		for {
+			select {
+			case h := <-hashChan:
+				if hash, ok := h.(string); ok {
+					s := db.get(hash)
+					c.WriteJSON(&PayloadGeneric{Event: "suprême", Message: s})
+					log.Println("sent:", hash)
+				}
+			case e := <-errorChan:
+				c.WriteJSON(&PayloadGeneric{Event: "error", Message: e.Error()})
+				log.Println("sent:", e)
+			case <-exitSender:
+				close(exitIndex)
+				return
+			}
+		}
+	}()
+
+	// receiver
+	go func() {
 		for {
 			var p Payload
 			err := c.ReadJSON(&p)
-			// log.Printf("%#v\n", p)
 			switch err {
-			case io.EOF:
-				log.Println("reader shutting down")
-				break here
 			case nil:
 				switch p.Event {
 				case "suprême":
 					var s Suprême
-					json.Unmarshal(p.Message, &s)
+					err := json.Unmarshal(p.Message, &s)
 					if err != nil {
-						errors <- err.Error()
-						close(esc)
+						errorChan <- err
+						close(exitSender)
+						return
 					}
 					s.FileName = html.EscapeString(s.FileName)
 					if len(s.FileName) > 255 {
 						s.FileName = s.FileName[:255]
 					}
-					hash, err := getFileHash(s.MagnetURI)
+					hash, err := GetInfoHash(s.MagnetURI)
 					if err != nil {
-						errors <- err.Error()
-						close(esc)
+						errorChan <- err
+						close(exitSender)
+						return
 					} else {
 						s.CreatedAt = time.Now()
 						log.Println("got:", hash)
@@ -143,39 +125,67 @@ func index(c *websocket.Conn) {
 					}
 				case "range":
 					var r Range
-					json.Unmarshal(p.Message, &r)
+					err := json.Unmarshal(p.Message, &r)
 					if err != nil {
-						errors <- err.Error()
-						close(esc)
+						errorChan <- err
+						close(exitSender)
+						return
 					}
 					sendRange("infinitescroll", r.Start, r.Limit)
 				}
+			case io.EOF:
+				log.Println("reader shutting down")
+				close(exitSender)
+				return
 			default:
 				log.Println("error:", err)
-				close(esc)
-				break here
+				close(exitSender)
+				return
 			}
 		}
 	}()
 
-	<-esc
+	<-exitIndex
 }
 
+// generic key-value store
 var db datastore
+
+// generic publish-subscribe
 var ps = pubsub.New(0)
 
 func main() {
+	// you do this in order to be able to defer or something.
 	Main()
 }
+
 func Main() {
+	var (
+		bindAddr      string
+		httpPort      int
+		documentRoot  string
+		websocketPort int
+		certFile      string
+		keyFile       string
+	)
+	flag.StringVar(&bindAddr, "bind-addr", "", "leave blank for 0.0.0.0")
+	flag.IntVar(&httpPort, "http-port", 443, "")
+	flag.StringVar(&documentRoot, "document-root", "../client", "path to fs")
+	flag.IntVar(&websocketPort, "websocket-port", 12345, "")
+	flag.StringVar(&certFile, "cert", "cert.pem", "path to cert")
+	flag.StringVar(&keyFile, "key", "key.pem", "path to key")
+	flag.Parse()
+
 	db.init()
 	defer ps.Shutdown()
 
-	log.Println("Listening on :443")
-	go fasthttp.ListenAndServeTLS(":443", "cert.pem", "key.pem", fasthttp.FSHandler("../client", 0))
+	bindHttp := fmt.Sprintf("%s:%d", bindAddr, httpPort)
+	log.Println("HTTP Listening on", bindHttp)
+	go fasthttp.ListenAndServeTLS(bindHttp, certFile, keyFile, fasthttp.FSHandler(documentRoot, 0))
 
-	log.Println("Listening on :12345")
-	fasthttp.ListenAndServeTLS(":12345", "cert.pem", "key.pem", func(ctx *fasthttp.RequestCtx) {
+	bindWebsocket := fmt.Sprintf("%s:%d", bindAddr, websocketPort)
+	log.Println("Listening on", bindWebsocket)
+	fasthttp.ListenAndServeTLS(bindWebsocket, certFile, keyFile, func(ctx *fasthttp.RequestCtx) {
 		upgrader := websocket.FastHTTPUpgrader{
 			CheckOrigin: func(ctx *fasthttp.RequestCtx) bool { return true },
 			Handler:     index,
