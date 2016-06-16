@@ -533,7 +533,7 @@ window.addEventListener("load", () => {
             return;
         }
         try {
-            let ws = new WebSocket("ws://" + location.host + ":12345/");
+            let ws = new WebSocket("wss://" + location.host + ":12345/");
             ws.onopen = () => {
                 sendPayload = (data) => ws.send(JSON.stringify(data));
                 window.dispatchEvent(new Event("WebSocketReady"));

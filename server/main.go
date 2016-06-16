@@ -144,8 +144,11 @@ func Main() {
 	db.init()
 	defer ps.Shutdown()
 
+	log.Println("Listening on :443")
+	go fasthttp.ListenAndServeTLS(":443", "cert.pem", "key.pem", fasthttp.FSHandler("../client", 0))
+
 	log.Println("Listening on :12345")
-	fasthttp.ListenAndServe(":12345", func(ctx *fasthttp.RequestCtx) {
+	fasthttp.ListenAndServeTLS(":12345", "cert.pem", "key.pem", func(ctx *fasthttp.RequestCtx) {
 		upgrader := websocket.FastHTTPUpgrader{
 			CheckOrigin: func(ctx *fasthttp.RequestCtx) bool { return true },
 			Handler:     index,
