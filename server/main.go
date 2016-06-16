@@ -9,11 +9,12 @@ import (
 	"net/http"
 	"net/url"
 	"regexp"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
 
-	"./broadcast"
+	"github.com/cskr/pubsub"
 )
 
 type Suprême struct {
@@ -78,14 +79,17 @@ func index(w http.ResponseWriter, r *http.Request) {
 	send := make(chan string)
 	esc := make(chan struct{})
 	go func() {
+		infohash := ps.Sub("infohash")
 		for {
 			select {
 			case <-esc:
 				return
-			case hash := <-send:
-				s := db.get(hash)
-				c.WriteJSON(s)
-				log.Println("sent:", hash)
+			case h := <-infohash:
+				if hash, ok := h.(string); ok {
+					s := db.get(hash)
+					c.WriteJSON(s)
+					log.Println("sent:", hash)
+				}
 			}
 		}
 	}()
@@ -93,21 +97,15 @@ func index(w http.ResponseWriter, r *http.Request) {
 	tmp := db.getRange(0, 5)
 	db.init()
 	for _, hash := range tmp {
-		send <- hash
+		ps.Pub(hash, "infohash")
 	}
-
-	go listen(b.Listen(), func(v interface{}) {
-		if hash, ok := v.(string); ok {
-			send <- hash
-		}
-	})
 
 	go func() {
 		rand.Seed(time.Now().Unix())
 		for {
 			select {
 			case <-time.After(time.Second * 2):
-				b.Write(tmp[rand.Intn(len(tmp))])
+				ps.Pub(tmp[rand.Intn(len(tmp))], "infohash")
 			case <-esc:
 				return
 			}
@@ -124,28 +122,22 @@ func index(w http.ResponseWriter, r *http.Request) {
 				log.Println("reader shutting down")
 				break here
 			case nil:
-
 				// validate structure ...
 				s.FileName = html.EscapeString(s.FileName)
 				if len(s.FileName) > 255 {
 					s.FileName = s.FileName[:255]
 				}
-
 				hash, err := getFileHash(s.MagnetURI)
 				if err != nil {
 					// send error message
 					log.Printf("error: %v\n", err)
 					close(esc)
 				} else {
-
 					s.CreatedAt = time.Now()
-
 					log.Println("got:", hash)
-
 					db.set(hash, s)
-					b.Write(hash)
+					ps.Pub(hash, "infohash")
 				}
-
 			default:
 				log.Printf("error: %v\n", err)
 				close(esc)
@@ -158,18 +150,15 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 var db datastore
-var b = broadcast.NewBroadcaster()
-
-func listen(r broadcast.Receiver, callback func(interface{})) {
-	for v := r.Read(); v != nil; v = r.Read {
-		go listen(r, callback)
-		callback(v)
-	}
-}
+var ps = pubsub.New(0)
 
 func main() {
+	Main()
+}
+func Main() {
 	db.init()
+	defer ps.Shutdown()
 	http.HandleFunc("/", index)
 	log.Println("Listening on :12345")
-	log.Panicln(http.ListenAndServe(":12345", nil))
+	http.ListenAndServe(":12345", nil)
 }
