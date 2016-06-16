@@ -5,12 +5,15 @@ import (
 	"html"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"regexp"
 	"time"
 
 	"github.com/gorilla/websocket"
+
+	"./broadcast"
 )
 
 type Suprême struct {
@@ -54,8 +57,6 @@ func getFileHash(magnet string) (string, error) {
 	return hash, nil
 }
 
-var pubsubhubbub chan string
-
 var upgrader = websocket.Upgrader{
 	// if you encounter this error:
 	//
@@ -74,24 +75,41 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
-	tmp := db.getRange(0, 5)
-	db.init()
-	for _, hash := range tmp {
-		s := db.get(hash)
-		c.WriteJSON(s)
-		log.Println("sent:", hash)
-	}
-
+	send := make(chan string)
 	esc := make(chan struct{})
 	go func() {
 		for {
-			if hash, ok := <-pubsubhubbub; ok {
+			select {
+			case <-esc:
+				return
+			case hash := <-send:
 				s := db.get(hash)
 				c.WriteJSON(s)
 				log.Println("sent:", hash)
-			} else {
-				log.Println("writer shutting down")
-				close(esc)
+			}
+		}
+	}()
+
+	tmp := db.getRange(0, 5)
+	db.init()
+	for _, hash := range tmp {
+		send <- hash
+	}
+
+	go listen(b.Listen(), func(v interface{}) {
+		if hash, ok := v.(string); ok {
+			send <- hash
+		}
+	})
+
+	go func() {
+		rand.Seed(time.Now().Unix())
+		for {
+			select {
+			case <-time.After(time.Second * 2):
+				b.Write(tmp[rand.Intn(len(tmp))])
+			case <-esc:
+				return
 			}
 		}
 	}()
@@ -116,7 +134,8 @@ func index(w http.ResponseWriter, r *http.Request) {
 				hash, err := getFileHash(s.MagnetURI)
 				if err != nil {
 					// send error message
-					log.Println("error:", err)
+					log.Printf("error: %v\n", err)
+					close(esc)
 				} else {
 
 					s.CreatedAt = time.Now()
@@ -124,11 +143,12 @@ func index(w http.ResponseWriter, r *http.Request) {
 					log.Println("got:", hash)
 
 					db.set(hash, s)
-					pubsubhubbub <- hash
+					b.Write(hash)
 				}
 
 			default:
-				log.Println("error:", err)
+				log.Printf("error: %v\n", err)
+				close(esc)
 				break here
 			}
 		}
@@ -138,10 +158,17 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 var db datastore
+var b = broadcast.NewBroadcaster()
+
+func listen(r broadcast.Receiver, callback func(interface{})) {
+	for v := r.Read(); v != nil; v = r.Read {
+		go listen(r, callback)
+		callback(v)
+	}
+}
 
 func main() {
 	db.init()
-	pubsubhubbub = make(chan string)
 	http.HandleFunc("/", index)
 	log.Println("Listening on :12345")
 	log.Panicln(http.ListenAndServe(":12345", nil))
