@@ -79,6 +79,7 @@ func (l lmodSlice) Swap(i, j int) {
 }
 
 func (db *datastore) getRange(start, limit int) []string {
+	limit -= 1
 	dir, err := os.Open(db.path)
 	checkErr(err)
 	files, err := dir.Readdir(-1)
@@ -95,7 +96,7 @@ func (db *datastore) getRange(start, limit int) []string {
 			continue
 		}
 		ret = append(ret, l.Name)
-		if i > limit {
+		if i >= limit {
 			break
 		}
 	}
