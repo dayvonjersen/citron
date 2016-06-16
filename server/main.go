@@ -5,12 +5,12 @@ import (
 	"html"
 	"io"
 	"log"
-	"net/http"
 	"net/url"
 	"regexp"
 	"time"
 
-	"github.com/gorilla/websocket"
+	"github.com/leavengood/websocket"
+	"github.com/valyala/fasthttp"
 
 	"github.com/cskr/pubsub"
 )
@@ -56,20 +56,8 @@ func getFileHash(magnet string) (string, error) {
 	return hash, nil
 }
 
-var upgrader = websocket.Upgrader{
-	// this gets around this error:
-	// "upgrade: websocket: origin not allowed"
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	}}
-
-func index(w http.ResponseWriter, r *http.Request) {
+func index(c *websocket.Conn) {
 	log.Println("----------------------------------------------")
-	c, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("upgrade:", err)
-		return
-	}
 	defer c.Close()
 
 	esc := make(chan struct{})
@@ -155,7 +143,13 @@ func main() {
 func Main() {
 	db.init()
 	defer ps.Shutdown()
-	http.HandleFunc("/", index)
+
 	log.Println("Listening on :12345")
-	http.ListenAndServe(":12345", nil)
+	fasthttp.ListenAndServe(":12345", func(ctx *fasthttp.RequestCtx) {
+		upgrader := websocket.FastHTTPUpgrader{
+			CheckOrigin: func(ctx *fasthttp.RequestCtx) bool { return true },
+			Handler:     index,
+		}
+		upgrader.UpgradeHandler(ctx)
+	})
 }
