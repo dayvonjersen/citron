@@ -51,6 +51,7 @@ type Range struct {
 
 // The route of the websocket
 func index(c *websocket.Conn) {
+	log.Println("hello?")
 	defer c.Close()
 
 	// is used for initial load and additional requests for infinite scroll
@@ -180,11 +181,11 @@ func Main() {
 	defer ps.Shutdown()
 
 	bindHttp := fmt.Sprintf("%s:%d", bindAddr, httpPort)
-	log.Println("HTTP Listening on", bindHttp)
+	log.Println("	  HTTP Listening on", bindHttp)
 	go fasthttp.ListenAndServeTLS(bindHttp, certFile, keyFile, fasthttp.FSHandler(documentRoot, 0))
 
 	bindWebsocket := fmt.Sprintf("%s:%d", bindAddr, websocketPort)
-	log.Println("Listening on", bindWebsocket)
+	log.Println("Websocket Listening on", bindWebsocket)
 	fasthttp.ListenAndServeTLS(bindWebsocket, certFile, keyFile, func(ctx *fasthttp.RequestCtx) {
 		upgrader := websocket.FastHTTPUpgrader{
 			CheckOrigin: func(ctx *fasthttp.RequestCtx) bool { return true },
