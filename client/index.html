@@ -678,12 +678,17 @@ window.addEventListener("load", () => {
         document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(title.codePointAt(0))));
     }, 250);
 
-    // box shadows on headers are mandatory in 2016
     mainElement.onscroll = () => {
+        // box shadows on headers are mandatory in 2016
         if(mainElement.scrollTop === 0) {
             mainElement.style.boxShadow = "none";
         } else {
             mainElement.style.boxShadow = "0px 10px 10px -5px rgb(204, 204, 204) inset";
+
+            let scrollTopMax = mainElement.scrollTopMax || (mainElement.scrollHeight - mainElement.getBoundingClientRect().height);
+            if(scrollTopMax - mainElement.scrollTop < 400) {
+                console.log("start loading!");
+            }
         }
     };
 
