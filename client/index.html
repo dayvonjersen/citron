@@ -678,17 +678,27 @@ window.addEventListener("load", () => {
         document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(title.codePointAt(0))));
     }, 250);
 
+    const perimeter = 400;      // "padding" or "buffer area" before absolute bottom of scroll
+    let lastScrollDistance = 0;
+    let isLoading = false;
     mainElement.onscroll = () => {
-        // box shadows on headers are mandatory in 2016
         if(mainElement.scrollTop === 0) {
             mainElement.style.boxShadow = "none";
         } else {
+            // box shadows on headers are mandatory in 2016
             mainElement.style.boxShadow = "0px 10px 10px -5px rgb(204, 204, 204) inset";
 
+            // mainElement will resize when it gets new contents so yes this must be recalculated
             let scrollTopMax = mainElement.scrollTopMax || (mainElement.scrollHeight - mainElement.getBoundingClientRect().height);
-            if(scrollTopMax - mainElement.scrollTop < 400) {
+            let scrollDistance = scrollTopMax - mainElement.scrollTop;
+            if(scrollDistance < perimeter          // within range
+            && scrollDistance < lastScrollDistance // scrolling downwards
+            && !isLoading                          // don't want to spam requests
+            ) {
+                isLoading = true;
                 console.log("start loading!");
             }
+            lastScrollDistance = scrollDistance;
         }
     };
 
