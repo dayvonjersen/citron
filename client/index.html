@@ -404,7 +404,14 @@ window.addEventListener("load", () => {
         let uuid = uniqid();
         articleElement.setAttribute("id", uuid);
 
+        let nevermind = false;
         playpauseElement.addEventListener("click", (evt) => {
+            if(articleElement.classList.contains("citrus__suprême--loading")) {
+                articleElement.classList.remove("citrus__suprême--loading");
+                nevermind = true;
+                return;
+            }
+
             let audioElement = articleElement.querySelector("audio");
             [].forEach.call(document.querySelectorAll("audio"), (otherAudioElement) => {
                 if(!!audioElement && otherAudioElement !== audioElement) {
@@ -415,6 +422,7 @@ window.addEventListener("load", () => {
             if(!audioElement) {
                 articleElement.classList.add("citrus__suprême--loading");
                 let readyFn = (err, audioElement) => {
+                    if(nevermind) return;
                     articleElement.classList.remove("citrus__suprême--paused");
                     articleElement.classList.remove("citrus__suprême--not-loaded");
                     articleElement.classList.remove("citrus__suprême--loading");
@@ -447,8 +455,12 @@ window.addEventListener("load", () => {
                 let loaded = false;
                 for(let i = 0; i < client.torrents.length; i++) {
                     if(client.torrents[i].magnetURI === magnetURI) {
-                        client.torrents[i].files[0].appendTo(`#${uuid}`, readyFn);
-                        loaded = true;
+                        if(!client.torrents[i].files.length) {
+                            client.remove(client.torrents[i].infoHash);
+                        } else {
+                            client.torrents[i].files[0].appendTo(`#${uuid}`, readyFn);
+                            loaded = true;
+                        }
                         break;
                     }
                 } 
