@@ -514,18 +514,28 @@ window.addEventListener("load", () => {
         errorMessage("Couldn't connect to websocket.");
         mainElement.innerHTML = "x_x";
     };
-    try {
-        let ws = new WebSocket("ws://" + location.host + ":12345/");
-        ws.onopen = () => {
-            sendPayload = (data) => ws.send(JSON.stringify(data));
-            window.dispatchEvent(new Event("WebSocketReady"));
-        };
-        ws.onmessage = (evt) => addChild(JSON.parse(evt.data));
-        ws.onerror = (evt) => wsError()
-    } catch(err) {
-        console.error(err.message);
-        wsError();
-    }
+    let connectionAttempts = 0;
+    let connectWebsocket = () => {
+        if(connectionAttempts > 5) {
+            wsError();
+            return;
+        }
+        try {
+            let ws = new WebSocket("ws://" + location.host + ":12345/");
+            ws.onopen = () => {
+                sendPayload = (data) => ws.send(JSON.stringify(data));
+                window.dispatchEvent(new Event("WebSocketReady"));
+            };
+            ws.onmessage = (evt) => addChild(JSON.parse(evt.data));
+            ws.onerror = (evt) => wsError();
+            ws.onclose = (evt) => connectWebsocket();    
+        } catch(err) {
+            console.error(err.message);
+            wsError();
+        }
+        connectionAttempts++;
+    };
+    connectWebsocket();
 
     //
     // add torrents

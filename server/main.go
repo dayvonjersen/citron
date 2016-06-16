@@ -57,16 +57,14 @@ func getFileHash(magnet string) (string, error) {
 }
 
 var upgrader = websocket.Upgrader{
-	// if you encounter this error:
-	//
-	// """upgrade: websocket: origin not allowed"""
-	//
-	// this gets around it:
+	// this gets around this error:
+	// "upgrade: websocket: origin not allowed"
 	CheckOrigin: func(r *http.Request) bool {
 		return true
 	}}
 
 func index(w http.ResponseWriter, r *http.Request) {
+	log.Println("----------------------------------------------")
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println("upgrade:", err)
