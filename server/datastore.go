@@ -72,7 +72,7 @@ func (l lmodSlice) Len() int {
 	return len(l)
 }
 func (l lmodSlice) Less(i, j int) bool {
-	return l[i].ModTime.After(l[j].ModTime)
+	return l[i].ModTime.Before(l[j].ModTime)
 }
 func (l lmodSlice) Swap(i, j int) {
 	l[i], l[j] = l[j], l[i]
@@ -88,11 +88,22 @@ func (db *datastore) getRange(start, limit int) []string {
 		ls = append(ls, lmod{strings.TrimRight(file.Name(), ".json"), file.ModTime()})
 	}
 	dir.Close()
-	sort.Sort(ls)
-	ret := []string{}
-	for i := start; i < limit; i++ {
+	sort.Sort(sort.Reverse(ls))
+	len := min(start+limit, len(ls))
+	size := len - start
+	ret := make([]string, size)
+	j := 0
+	for i := start; i < len; i++ {
 		l := ls[i]
-		ret = append(ret, l.Name)
+		ret[size-j-1] = l.Name
+		j++
 	}
 	return ret
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
