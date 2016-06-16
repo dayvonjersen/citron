@@ -113,7 +113,7 @@ func index(c *websocket.Conn) {
 		for {
 			var p Payload
 			err := c.ReadJSON(&p)
-			log.Printf("%#v\n", p)
+			// log.Printf("%#v\n", p)
 			switch err {
 			case io.EOF:
 				log.Println("reader shutting down")
