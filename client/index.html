@@ -523,6 +523,7 @@ window.addEventListener("load", () => {
 
     let isLoading = true; // used way later
     let startIndex = 0;   // for infinite scroll , ctrl+f for "onscroll" 
+    let reachedEnd = false;
     let sendPayload;
     let wsError = () => {
         errorMessage("Couldn't connect to websocket.");
@@ -548,7 +549,7 @@ window.addEventListener("load", () => {
                 let data;
                 try {
                     data = JSON.parse(evt.data);
-                    if(!data.event || !data.message) throw new Error();
+                    if(!data.event && !data.message) throw new Error();
                 } catch(e) {
                     errorMessage("Malformed JSON response:"+JSON.stringify(evt.data));
                 }
@@ -563,7 +564,11 @@ window.addEventListener("load", () => {
                     break;
                 case "loaded":
                     isLoading = false;
-                    startIndex = data.message;
+                    console.log("loaded:"+data.message);
+                    startIndex += data.message|0;
+                    if(data.message == 0) {
+                        reachedEnd = true;
+                    }
                     break;
                 case "error":
                     errorMessage(data.message);
@@ -710,6 +715,10 @@ window.addEventListener("load", () => {
         document.title = substr+(""["to"+(rand(0,2)?"Upper":"Lower")+"Case"].call(String.fromCodePoint(title.codePointAt(0))));
     }, 250);
 
+    //
+    // ~infinite scroll~
+    //
+
     const perimeter = 400;      // "padding" or "buffer area" before absolute bottom of scroll
     let lastScrollDistance = 0;
     mainElement.onscroll = () => {
@@ -722,7 +731,8 @@ window.addEventListener("load", () => {
             // mainElement will resize when it gets new contents so yes this must be recalculated
             let scrollTopMax = mainElement.scrollTopMax || (mainElement.scrollHeight - mainElement.getBoundingClientRect().height);
             let scrollDistance = scrollTopMax - mainElement.scrollTop;
-            if(scrollDistance < perimeter          // within range
+            if(!reachedEnd
+            && scrollDistance < perimeter          // within range
             && scrollDistance < lastScrollDistance // scrolling downwards
             && !isLoading                          // don't want to spam requests
             ) {
