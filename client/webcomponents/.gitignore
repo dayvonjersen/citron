@@ -1,9 +1,0 @@
-dist/*
-!dist/.keep
-src/*
-!src/.keep
-tmp/*
-!tmp/.keep
-vendor/*
-!vendor/.keep
-composer.lock
