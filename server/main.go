@@ -5,11 +5,9 @@ import (
 	"html"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"net/url"
 	"regexp"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -76,10 +74,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 	}
 	defer c.Close()
 
-	send := make(chan string)
 	esc := make(chan struct{})
+	infohash := ps.Sub("infohash")
 	go func() {
-		infohash := ps.Sub("infohash")
 		for {
 			select {
 			case <-esc:
@@ -97,20 +94,22 @@ func index(w http.ResponseWriter, r *http.Request) {
 	tmp := db.getRange(0, 5)
 	db.init()
 	for _, hash := range tmp {
-		ps.Pub(hash, "infohash")
+		infohash <- hash
 	}
 
-	go func() {
-		rand.Seed(time.Now().Unix())
-		for {
-			select {
-			case <-time.After(time.Second * 2):
-				ps.Pub(tmp[rand.Intn(len(tmp))], "infohash")
-			case <-esc:
-				return
+	/*
+		go func() {
+			rand.Seed(time.Now().Unix())
+			for {
+				select {
+				case <-time.After(time.Second * 2):
+					ps.Pub(tmp[rand.Intn(len(tmp))], "infohash")
+				case <-esc:
+					return
+				}
 			}
-		}
-	}()
+		}()
+	*/
 
 	go func() {
 	here:
