@@ -51,7 +51,6 @@ type Range struct {
 
 // The route of the websocket
 func index(c *websocket.Conn) {
-	log.Println("hello?")
 	defer c.Close()
 
 	// is used for initial load and additional requests for infinite scroll
@@ -60,6 +59,7 @@ func index(c *websocket.Conn) {
 		for _, hash := range db.getRange(start, limit) {
 			s := db.get(hash)
 			c.WriteJSON(&PayloadGeneric{Event: event, Message: s})
+			log.Println("sent:", hash)
 			i++
 		}
 		c.WriteJSON(&PayloadGeneric{Event: "loaded", Message: i})
@@ -181,7 +181,7 @@ func Main() {
 	defer ps.Shutdown()
 
 	bindHttp := fmt.Sprintf("%s:%d", bindAddr, httpPort)
-	log.Println("	  HTTP Listening on", bindHttp)
+	log.Println("     HTTP Listening on", bindHttp)
 	go fasthttp.ListenAndServeTLS(bindHttp, certFile, keyFile, fasthttp.FSHandler(documentRoot, 0))
 
 	bindWebsocket := fmt.Sprintf("%s:%d", bindAddr, websocketPort)
