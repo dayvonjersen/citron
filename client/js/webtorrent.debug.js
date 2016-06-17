@@ -17763,7 +17763,7 @@ function Peer (opts) {
   }
 
   if (self.stream) self._pc.addStream(self.stream)
-  self._pc.onaddstream = function (event) {
+  self._pc.ontrack = function (event) {
     self._onAddStream(event)
   }
 
@@ -17931,7 +17931,7 @@ Peer.prototype._destroy = function (err, onclose) {
     self._pc.oniceconnectionstatechange = null
     self._pc.onsignalingstatechange = null
     self._pc.onicecandidate = null
-    self._pc.onaddstream = null
+    self._pc.ontrack = null
     self._pc.onnegotiationneeded = null
     self._pc.ondatachannel = null
   }
