@@ -180,8 +180,14 @@ func Main() {
 	db.init()
 	defer ps.Shutdown()
 
+	// redirect http traffic to https
+	go fasthttp.ListenAndServe(bindAddr+":80", func(ctx *fasthttp.RequestCtx) {
+		ctx.Response.Header.SetStatusCode(fasthttp.StatusTemporaryRedirect) // Use StatusMovedPermanently  if you know what you doing
+		ctx.Response.Header.Set("Location", "https://"+string(ctx.Request.Host())+string(ctx.Path()))
+	})
+
 	bindHttp := fmt.Sprintf("%s:%d", bindAddr, httpPort)
-	log.Println("     HTTP Listening on", bindHttp)
+	log.Println("    HTTPS Listening on", bindHttp)
 	go fasthttp.ListenAndServeTLS(bindHttp, certFile, keyFile, fasthttp.FSHandler(documentRoot, 0))
 
 	bindWebsocket := fmt.Sprintf("%s:%d", bindAddr, websocketPort)
