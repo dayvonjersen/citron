@@ -377,6 +377,11 @@ window.addEventListener("load", () => {
 
     let mainElement = document.querySelector("main");
     let volumeElement = document.querySelector("input[type='range']");
+    let selectedAudioElement = null;
+    volumeElement.addEventListener("input", () => {
+        if(!selectedAudioElement)  return;
+        selectedAudioElement.volume = volumeElement.value / 100
+    });
     initInputRange(volumeElement);
     let previousVolume = volumeElement.value;
     // XXX only global for debugging
@@ -434,9 +439,8 @@ window.addEventListener("load", () => {
                     }
 
                     audioElement.setAttribute("selected","");
-
+                    selectedAudioElement = audioElement;
                     audioElement.volume = volumeElement.value / 100;
-                    volumeElement.addEventListener("input", () => audioElement.volume = volumeElement.value / 100);
 
                     audioElement.addEventListener("pause", () => {
                         articleElement.classList.add("citrus__suprême--paused");
@@ -472,6 +476,7 @@ window.addEventListener("load", () => {
                 }
             } else if(!waveformBoxElement.classList.contains("not-loaded")) {
                 audioElement.setAttribute("selected","");
+                selectedAudioElement = audioElement;
                 if(audioElement.paused) {
                     audioElement.play();
                 } else {
@@ -771,11 +776,13 @@ window.addEventListener("load", () => {
         }
         volumeElement.dispatchEvent(new Event("input"));
     });
-    key('up', () => {
+    key('ctrl+up', (e) => {
+        e.preventDefault();
         volumeElement.value = Math.min(100, (volumeElement.value|0)+5);
         volumeElement.dispatchEvent(new Event("input"));
     });
-    key('down', () => {
+    key('ctrl+down', (e) => {
+        e.preventDefault();
         volumeElement.value = Math.max(0, (volumeElement.value|0)-5);
         volumeElement.dispatchEvent(new Event("input"));
     });
