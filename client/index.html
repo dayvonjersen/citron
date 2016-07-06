@@ -42,6 +42,10 @@
         <script src="js/input-type-range.js"></script>
     </head>
     <body>
+        <noscript><FONT COLOR=GRAY><I>This page intentionally left broken.</I><xmp>
+                    <!--// JOIN THE TWENTY-FIRST CENTURY, GRAMPS.--> 
+        </noscript>
+
         <header>
             <div style="display:flex;align-items:center">
                 <!--
@@ -180,6 +184,7 @@ window.aboutModal = () => {}
 
 // int main(void) {
 window.addEventListener("load", () => {
+    document.body.removeChild(document.querySelector('noscript'));
 
     //
     // utility functions
