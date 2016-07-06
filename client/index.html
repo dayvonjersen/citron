@@ -183,7 +183,16 @@ window.aboutModal = () => {}
 
 // int main(void) {
 window.addEventListener("load", () => {
+    //
+    // touch the DOM inappropriately
+    //
     document.body.removeChild(document.querySelector('noscript'));
+    [].forEach.call(document.querySelectorAll('.cbutton'), (buttonElement) => {
+        buttonElement.addEventListener("click", () => {
+            buttonElement.classList.add("cbutton--click");
+            setTimeout(()=>buttonElement.classList.remove("cbutton--click"),1250);
+        });
+    });
 
     //
     // utility functions
