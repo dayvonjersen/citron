@@ -39,7 +39,6 @@
             ana tudor!
         -->
         <link rel="stylesheet" href="css/input-type-range.css">
-        <script src="js/input-type-range.js"></script>
     </head>
     <body>
         <noscript><FONT COLOR=GRAY><I>This page intentionally left broken.</I><xmp>
@@ -86,9 +85,9 @@
             <!--
                 knob
             -->
-            <input type="range" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
+            <input type="range" style="position:absolute" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
             <span style="float:right" title="upload speed">&uarr; <span class="clientUpload">0 B/s</span>&emsp;</span>
-            <span style="float:right" title="download speed">&darr; <span class="clientDownload">0 B/s</span></span>
+            <span style="float:right;display:inline-block;padding:0 1em" title="download speed">&darr; <span class="clientDownload">0 B/s</span></span>
         </footer>
 
         <!--
@@ -387,7 +386,6 @@ window.addEventListener("load", () => {
         if(!selectedAudioElement)  return;
         selectedAudioElement.volume = volumeElement.value / 100
     });
-    initInputRange(volumeElement);
     let previousVolume = volumeElement.value;
     // XXX only global for debugging
     window.client = new WebTorrent();
@@ -535,7 +533,7 @@ window.addEventListener("load", () => {
         `The more we have known of the really good things, the more insipid the thin lemonade of later literature becomes, sometimes almost to the point of making us sick. Do you know a work of literature written in the last, say, fifteen years that you think has any lasting quality? I don&rsquo;t. It is partly idle chatter, partly propaganda, partly self-pitying sentimentality, but there is no insight, no ideas, no clarity, no substance and almost always the language is bad and constrained. On this subject I am quite consciously a laudator temporis acti.`,
         `At my lemonade stand I used to give the first glass away free and charge five dollars for the second glass. The refill contained the antidote.`,
         `We go old-school during the summer, like swimming or setting up lemonade stands. I try to teach my kids to make their own fun.`,
-        `You picked a lemon, throw it away lemonade is overrated. Freaks should remain at the circus, not in your apartment. You already have one asshole. You don&rsquo;t need another. Make a space in your life for the glorious things you deserve. Have faith`,
+        `You picked a lemon, throw it away lemonade is overrated. Freaks should remain at the circus, not in your apartment. You already have one asshole. You don&rsquo;t need another. Make a space in your life for the glorious things you deserve. Have faith.`,
         `We are living in a world today where lemonade is made from artificial flavors and furniture polish is made from real lemons.`,
         `But the fool does the exact opposite. If he finds that life has handed him a lemon, he gives up and says: &ldquo;I&rsquo;m beaten. It is fate. I haven&rsquo;t got a chance.&rdquo; Then he proceeds to rail against the world and indulge in an orgy of self-pity. But when the wise man is handed a lemon, he says: &ldquo;What lesson can I learn from this misfortune? How can I improve my situation?&rdquo;`,
         `Instead of a Lemonade Stand, I should open up a &ldquo;You know what I can&rsquo;t stand?&rdquo; Stand. I&rsquo;ll sell rants in small, medium, and large.`,
