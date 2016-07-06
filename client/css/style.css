@@ -81,6 +81,10 @@ footer hr {
     margin: 64px 0;
 }
 
+.citrus__suprême audio {
+    display: none;
+}
+
 .citrus__suprême-inner-row {
     display: flex;
     flex-wrap: nowrap;

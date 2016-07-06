@@ -530,6 +530,7 @@ window.addEventListener("load", () => {
         } else {
             mainElement.appendChild(tpl);
         }
+        mainElement.removeAttribute("empty");
     };
 
     //
@@ -595,11 +596,9 @@ window.addEventListener("load", () => {
 
                 switch(data.event) {
                 case "suprême":
-                    mainElement.removeAttribute("empty");
                     addChild(data.message);
                     break;
                 case "infinitescroll":
-                    mainElement.removeAttribute("empty");
                     addChild(data.message, false);
                     break;
                 case "loaded":
@@ -698,6 +697,8 @@ window.addEventListener("load", () => {
             console.log("promise.all complete");
             //console.log(JSON.stringify(metadata));
             sendPayload("suprême",metadata);
+            //metadata.createdAt=new Date;
+            //addChild(metadata);
         }, () => {
             console.log("Something happened.")
         });
