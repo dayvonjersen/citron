@@ -568,7 +568,8 @@ window.addEventListener("load", () => {
     let sendPayload;
     let wsError = () => {
         errorMessage("Couldn't connect to websocket.");
-        mainElement.innerHTML = "x_x";
+        mainElement.setAttribute("empty", "");
+        mainElement.innerHTML = `<div class="hiddenMessage"><h1>${(Math.random()*100|0)&1?"everything is on 🔥":"shit's broke"}  come back later.</h1></div>`;
     };
     let connectionAttempts = 0;
     let connectWebsocket = () => {
