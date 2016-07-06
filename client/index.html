@@ -70,7 +70,7 @@
                                 <path d="M54,37.7V91c0,2.2-1.8,4-4,4s-4-1.8-4-4V37.7L26.7,54.9c-1.7,1.5-4.2,1.4-5.7-0.3 s-1.3-4.2,0.3-5.6l26-23.1l2.7-2.4l2.7,2.4l26,23.1c1.7,1.5,1.8,4,0.3,5.6c-1.5,1.7-4,1.8-5.6,0.3L54,37.7L54,37.7z M76,13 c2.2,0,4-1.8,4-4s-1.8-4-4-4H24c-2.2,0-4,1.8-4,4s1.8,4,4,4H76L76,13z"/>
                             </g>
                         </svg>
-                        <input type="file" style="display:none">
+                        <input id="uploadButton" type="file" accept="audio/*" style="display:none">
                     </label>
                 </div>
             </div>
@@ -83,7 +83,7 @@
                 knob
             -->
             <input type="range" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
-            <span style="float:right" title="upload speed">&uarr; <span class="clientUpload">0 B/s</span></span>
+            <span style="float:right" title="upload speed">&uarr; <span class="clientUpload">0 B/s</span>&emsp;</span>
             <span style="float:right" title="download speed">&darr; <span class="clientDownload">0 B/s</span></span>
         </footer>
 
@@ -521,12 +521,32 @@ window.addEventListener("load", () => {
     };
 
     //
+    // easter came early
+    //
+    const quotes = [
+        `What&rsquo;s lemonade? Something you make out of lemons. And what&rsquo;s a crusade? Something you make out of crosses&mdash;a course of gratuitous violence motivated by an obsession with unanalyzed symbols.`,
+        `I believe that if life gives you lemons, you should make lemonade... and try to find somebody whose life has given them vodka, and have a party.`,
+        `Luther had passed many a white church in his day, heard them singing their hymns and chanting their &ldquo;Amens&rdquo; and seen them gather on a porch or two afterward with their lemonade and piety, but he knew if he ever showed up on their steps, starving or injured, the only response he&rsquo;d get to a plea for human kindness would be the amen of a shotgun pointed in his face.`,
+        `The more we have known of the really good things, the more insipid the thin lemonade of later literature becomes, sometimes almost to the point of making us sick. Do you know a work of literature written in the last, say, fifteen years that you think has any lasting quality? I don&rsquo;t. It is partly idle chatter, partly propaganda, partly self-pitying sentimentality, but there is no insight, no ideas, no clarity, no substance and almost always the language is bad and constrained. On this subject I am quite consciously a laudator temporis acti.`,
+        `At my lemonade stand I used to give the first glass away free and charge five dollars for the second glass. The refill contained the antidote.`,
+        `We go old-school during the summer, like swimming or setting up lemonade stands. I try to teach my kids to make their own fun.`,
+        `You picked a lemon, throw it away lemonade is overrated. Freaks should remain at the circus, not in your apartment. You already have one asshole. You don&rsquo;t need another. Make a space in your life for the glorious things you deserve. Have faith`,
+        `We are living in a world today where lemonade is made from artificial flavors and furniture polish is made from real lemons.`,
+        `But the fool does the exact opposite. If he finds that life has handed him a lemon, he gives up and says: &ldquo;I&rsquo;m beaten. It is fate. I haven&rsquo;t got a chance.&rdquo; Then he proceeds to rail against the world and indulge in an orgy of self-pity. But when the wise man is handed a lemon, he says: &ldquo;What lesson can I learn from this misfortune? How can I improve my situation?&rdquo;`,
+        `Instead of a Lemonade Stand, I should open up a &ldquo;You know what I can&rsquo;t stand?&rdquo; Stand. I&rsquo;ll sell rants in small, medium, and large.`,
+        `&ldquo;B-but, Mr Jimson, I w-want to be an artist.&rdquo; &ldquo;Of course you do,&rdquo; I said, &ldquo;everybody does once. But they get over it, thank God, like the measles and the chickenpox. Go home and go to bed and take some hot lemonade and put on three blankets and sweat it out.&rdquo; &ldquo;But Mr J-Jimson, there must be artists.&rdquo; &ldquo;Yes, and lunatics and lepers, but why go and live in an asylum before you&rsquo;re sent for? If you find life a bit dull at home,&rdquo; I said, &ldquo;and want to amuse yourself, put a stick of dynamite in the kitchen fire, or shoot a policeman. Volunteer for a test pilot, or dive off Tower Bridge with five bob&rsquo;s worth of roman candles in each pocket. You&rsquo;d get twice the fun at about one-tenth of the risk.&rdquo;`,
+    ];
+
+    mainElement.setAttribute("empty", "");
+    window.addEventListener("WebSocketReady", () => {
+        mainElement.innerHTML = `<label for="uploadButton" class="hiddenMessage"><em>${quotes[Math.random()*quotes.length|0]}</em></label>`;
+    });
+
+    //
     // websocket
     //
 
     mainElement.innerHTML = "Opening websocket...";
-    window.addEventListener("WebSocketReady", () => mainElement.innerHTML = "");
-
     let isLoading = true; // used way later
     let startIndex = 0;   // for infinite scroll , ctrl+f for "onscroll" 
     let reachedEnd = false;
@@ -563,9 +583,11 @@ window.addEventListener("load", () => {
 
                 switch(data.event) {
                 case "suprême":
+                    mainElement.removeAttribute("empty");
                     addChild(data.message);
                     break;
                 case "infinitescroll":
+                    mainElement.removeAttribute("empty");
                     addChild(data.message, false);
                     break;
                 case "loaded":
