@@ -91,6 +91,9 @@ func (db *datastore) getRange(start, limit int) []string {
 	sort.Sort(sort.Reverse(ls))
 	len := min(start+limit, len(ls))
 	size := len - start
+	if size <= 0 {
+		return []string{}
+	}
 	ret := make([]string, size)
 	j := 0
 	for i := start; i < len; i++ {
