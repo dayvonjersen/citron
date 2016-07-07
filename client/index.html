@@ -87,7 +87,7 @@
             <!--
                 knob
             -->
-            <input type="range" style="position:absolute" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
+            <input type="range" class="citrus__volume" title="adjust volume" min="0" max="100" step="1" value="75">
             <span style="float:right" title="upload speed">&uarr; <span class="clientUpload">0 B/s</span>&emsp;</span>
             <span style="float:right;display:inline-block;padding:0 1em" title="download speed">&darr; <span class="clientDownload">0 B/s</span></span>
         </footer>
@@ -415,15 +415,15 @@ window.addEventListener("load", () => {
 
         let tpl = getTemplate("suprême");
 
-        let articleElement = tpl.querySelector('article');
-        let fileNameElement = tpl.querySelector('.fileName');
-        let magnetURIElement = tpl.querySelector('.magnetURI');
+        let articleElement     = tpl.querySelector('article');
+        let fileNameElement    = tpl.querySelector('.fileName');
+        let magnetURIElement   = tpl.querySelector('.magnetURI');
         let waveformURIElement = tpl.querySelector('.waveformURI');
-        let durationElement = tpl.querySelector('.duration');
-        let createdAtElement = tpl.querySelector('.createdAt');
-        let playpauseElement = tpl.querySelector('.citrus__suprême-playpause-column'); 
+        let durationElement    = tpl.querySelector('.duration');
+        let createdAtElement   = tpl.querySelector('.createdAt');
+        let playpauseElement   = tpl.querySelector('.citrus__suprême-playpause-column');
         let waveformBoxElement = tpl.querySelector('.waveformBox');
-        let infoElement = tpl.querySelector(".citrus__suprême-info");
+        let infoElement        = tpl.querySelector(".citrus__suprême-info");
 
         let uuid = uniqid();
         articleElement.setAttribute("id", uuid);

@@ -60,12 +60,12 @@ body > header {
  */
 footer {
     text-align: center;
-    color: rgba(30, 24, 26, 0.25);
+    color: rgba(30, 24, 26, 0.5);
     padding: 1em 0;
 }
 
 footer hr {
-    border: 1px rgba(30, 24, 26, 0.25) solid;
+    border: 1px rgba(30, 24, 26, 0.5) solid;
     margin-bottom: 1em;
 }
 
@@ -161,19 +161,31 @@ footer hr {
     right: 0;
     bottom: 0;
 }
-
+.citrus__suprême-info a {
+    text-decoration: underline;
+    font-weight: bold;
+    padding: .6667em 1em;
+    transition: background-color .25s ease-out;
+}
+.citrus__suprême-info a:hover {
+    text-decoration: none;
+}
+.citrus__suprême-info a:active,
+.citrus__suprême-info a:focus {
+    background-color: #fef200;
+}
 .citrus__suprême-info > *:not(.duration) {
     font-size: x-small;
+    vertical-align: bottom;
+    margin-left: .5rem;
 }
-.citrus__suprême-info > * {
+.citrus__suprême-info .duration {
     background: rgba(30, 24, 26, 0.92);
     color: #fefbf6;
     padding: 2px 4px;
-    margin-left: 0.5em;
-    vertical-align: bottom;
+    margin-left: .5rem;
 }
-
-.citrus__suprême .torrentStatus {
+.citrus__suprême-info .torrentStatus {
     opacity: 1;
     transition: opacity 0.5s ease-out 0.5s;
 }
@@ -264,7 +276,7 @@ button.cbutton.cbutton--effect-sanja {
     justify-content: center;
     height: 100%;
     width: 100%;
-    color: rgba(30, 24, 26, 0.07);
+    color: rgba(30, 24, 26, 0.5);
     user-select: none;
     -moz-user-select: none;
     -webkit-user-select: none;
