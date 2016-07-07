@@ -256,6 +256,17 @@ window.addEventListener("load", () => {
         return `${h > 0 ? zeroPad(h)+'h:' : ''}${zeroPad(m)}m:${zeroPad(s)}s`;
     };
 
+    // format bytes e.g. 2048 == 2 mb
+    const byteUnits = ['','k','m','g','t','p'];
+    let formatBytes = (b) => {
+        k = 0;
+        while(b >= 1024) {
+            k++;
+            b/=1024;
+        }
+        return `${b.toPrecision(3).replace(/[0\.]+$/,'') || "0"} ${byteUnits[k]}b`;
+    };
+
     // the penguin of doom
     let rand = (min, max) => Math.floor(Math.random() * (max - min)) + min;
 
@@ -498,32 +509,25 @@ window.addEventListener("load", () => {
                                 let a = document.createElement("a");
                                 a.download = file.name;
                                 a.href = url;
-                                a.textContent = "Direct Download";
+                                a.textContent = "Direct Download ("+formatBytes(file.length)+")";
                                 infoElement.insertBefore(a, infoElement.firstElementChild);
                             });
                         });
-                        let peers = new Set();
                         let displayElement = articleElement.querySelector(".torrentStatus");
-                        let displayPeers = () => {
-                            displayElement.innerHTML = `connected to ${peers.size} peer${peers.size == 1 ? '' : 's'}`;
-                        };
-                        torrent.on('wire', (wire) => {
-                            let id = wire.peerId;
-                            peers.add(id);
-                            displayPeers();
-                            wire.once('close', () => {
-                                peers.delete(id);
-                                displayPeers();
-                            });
-                        });
+                        let it = setInterval(() => {
+                            displayElement.innerHTML = `connected to ${torrent.numPeers} peer${torrent.numPeers == 1 ? '' : 's'}`;
+                        }, 1000);
                         torrent.on('noPeers', () => {
+                            clearInterval(it);
                             displayElement.innerHTML = 'no peers online (dead)';
                         });
                         torrent.on('error', (err) => {
+                            clearInterval(it);
                             displayElement.innerHTML = err.message;
                             errorMessage(err.message)
                         });
                         torrent.on('warning', (err) => {
+                            clearInterval(it);
                             displayElement.innerHTML = err.message;
                             errorMessage(err.message)
                         });
@@ -759,19 +763,9 @@ window.addEventListener("load", () => {
     // ul/dl speeds
     let clientUpload = document.querySelector('.clientUpload');
     let clientDownload = document.querySelector('.clientDownload');
-    let formatBytes = (b) => {
-        b |= 0;
-        let u = '';
-        switch(true) {
-        case (b >= 1000 && b < 1000000): u = 'K'; b/=1000; break;
-        case (b >= 1000000 && b < 1000000000): u = 'M'; b/=1000000; break;
-        case (b > 1000000000): u = 'G'; b/=1000000000; break;
-        }
-        return `${b.toPrecision(3).replace(/[0\.]+$/,'') || "0"} ${u}B/s`;
-    };
     setInterval(() => {
-        clientUpload.innerHTML = formatBytes(client.uploadSpeed);
-        clientDownload.innerHTML = formatBytes(client.downloadSpeed);
+        clientUpload.innerHTML = formatBytes(client.uploadSpeed)+'/s';
+        clientDownload.innerHTML = formatBytes(client.downloadSpeed)+'/s';
     }, 1000);
 
     // keeps timestamps up-to-date, e.g. "5 minutes ago" actually being true
