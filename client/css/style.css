@@ -135,12 +135,16 @@ footer hr {
 }
 /*img*/.waveform--yellow, .waveform--black {
     width: 100%;
-    height: 128px;
+    height: 96px;
     cursor: pointer;
 }
 .citrus__suprême--not-loaded .waveformBox {
     filter: grayscale(1) opacity(0.5);
     -webkit-filter: grayscale(1) opacity(0.5);
+}
+
+.waveformBox {
+    margin: -2px;
 }
 
 .citrus__suprême-info {
@@ -167,7 +171,7 @@ footer hr {
 
 /*h1*/.citrus__suprême-title {
     font-size: 26px;
-    margin-bottom: 2px;
+    margin-bottom: .5em;
     position: relative;
 }
 .citrus__suprême-title a {

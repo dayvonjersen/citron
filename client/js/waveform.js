@@ -24,7 +24,7 @@ function getWaveformDataURI(peaks, duration, waveColor) {
 
     let width = Math.round(duration * minPxPerSec * pixelRatio);
     canvasElement.width = width;
-    canvasElement.height = 128;
+    canvasElement.height = 96;
 
     drawPeaks(canvasCtx, peaks, width, waveColor);
     return canvasElement.toDataURL();
@@ -81,7 +81,7 @@ function drawPeaks(canvasCtx, peaks, width, waveColor, splitChannels=false, chan
        if (peaks[0] instanceof Array) {
        let channels = peaks;
        if (splitChannels) {
-       this.setHeight(channels.length * 128 * pixelRatio);
+       this.setHeight(channels.length * 96 * pixelRatio);
        channels.forEach(this.drawWave, this);
        return;
        } else {
@@ -103,7 +103,7 @@ function drawPeaks(canvasCtx, peaks, width, waveColor, splitChannels=false, chan
 
     // A half-pixel offset makes lines crisp
     let $ = 0.5 / pixelRatio;
-    let height = 128;
+    let height = 96;
     let offsetY = height * channelIndex || 0;
     let halfH = height / 2;
     let length = ~~(peaks.length / 2);
