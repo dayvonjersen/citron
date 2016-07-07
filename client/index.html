@@ -145,7 +145,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="citrus__suprême-info"><small class="torrent">connecting...</small><time class="duration" data-value></time></div>
+                <div class="citrus__suprême-info">
+                    <small class="torrentStatus">connecting...</small>
+                    <time class="duration" data-value></time>
+                </div>
             </article>
         </template>
 
@@ -420,6 +423,7 @@ window.addEventListener("load", () => {
         let createdAtElement = tpl.querySelector('.createdAt');
         let playpauseElement = tpl.querySelector('.citrus__suprême-playpause-column'); 
         let waveformBoxElement = tpl.querySelector('.waveformBox');
+        let infoElement = tpl.querySelector(".citrus__suprême-info");
 
         let uuid = uniqid();
         articleElement.setAttribute("id", uuid);
@@ -465,6 +469,7 @@ window.addEventListener("load", () => {
 
                     audioElement.addEventListener("timeupdate", () => {
                         waveformBoxElement.setPosition(audioElement.currentTime / duration);
+                        durationElement.innerHTML = fduration((duration - audioElement.currentTime)|0);
                     });
 
                     waveformBoxElement.addEventListener("update", () => {
@@ -493,12 +498,12 @@ window.addEventListener("load", () => {
                                 let a = document.createElement("a");
                                 a.download = file.name;
                                 a.href = url;
-                                a.textContent = "Download";
-                                articleElement.appendChild(a);
+                                a.textContent = "Direct Download";
+                                infoElement.insertBefore(a, infoElement.firstElementChild);
                             });
                         });
                         let peers = new Set();
-                        let displayElement = articleElement.querySelector(".torrent");
+                        let displayElement = articleElement.querySelector(".torrentStatus");
                         let displayPeers = () => {
                             displayElement.innerHTML = `connected to ${peers.size} peer${peers.size == 1 ? '' : 's'}`;
                         };

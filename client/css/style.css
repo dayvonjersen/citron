@@ -162,6 +162,9 @@ footer hr {
     bottom: 0;
 }
 
+.citrus__suprême-info > *:not(.duration) {
+    font-size: x-small;
+}
 .citrus__suprême-info > * {
     background: rgba(30, 24, 26, 0.92);
     color: #fefbf6;
@@ -170,12 +173,11 @@ footer hr {
     vertical-align: bottom;
 }
 
-.citrus__suprême .torrent {
-    font-size: x-small;
+.citrus__suprême .torrentStatus {
     opacity: 1;
     transition: opacity 0.5s ease-out 0.5s;
 }
-.citrus__suprême--not-loaded:not(.citrus__suprême--loading) .torrent {
+.citrus__suprême--not-loaded:not(.citrus__suprême--loading) .torrentStatus {
     opacity: 0;
 }
 
