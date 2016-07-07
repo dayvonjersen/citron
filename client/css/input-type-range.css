@@ -16,7 +16,7 @@ input[type='range']::-webkit-slider-runnable-track {
   width: 10em;
   height: 0.25em;
   border-radius: 0.125em;
-  background: #0170c2;
+  background: #1e181a;
 }
 input[type='range']::-moz-range-track {
   border: none;
@@ -24,7 +24,7 @@ input[type='range']::-moz-range-track {
   width: 10em;
   height: 0.25em;
   border-radius: 0.125em;
-  background: #0170c2;
+  background: #1e181a;
 }
 input[type='range']::-ms-track {
   margin: 0 0.75em;
@@ -33,7 +33,7 @@ input[type='range']::-ms-track {
   width: 10em;
   height: 0.25em;
   border-radius: 0.125em;
-  background: #0170c2;
+  background: #1e181a;
   color: transparent;
 }
 input[type='range']::-webkit-slider-thumb {
@@ -43,7 +43,7 @@ input[type='range']::-webkit-slider-thumb {
   width: 1.5em;
   height: 1.5em;
   border-radius: 50%;
-  background: #0170c2;
+  background: #1e181a;
   transition: .3s;
 }
 input[type='range']::-moz-range-thumb {
@@ -52,7 +52,7 @@ input[type='range']::-moz-range-thumb {
   width: 1.5em;
   height: 1.5em;
   border-radius: 50%;
-  background: #0170c2;
+  background: #1e181a;
   transition: .3s;
   cursor: ew-resize;
 }
@@ -62,7 +62,7 @@ input[type='range']::-ms-thumb {
   width: 1.5em;
   height: 1.5em;
   border-radius: 50%;
-  background: #0170c2;
+  background: #1e181a;
   transition: .3s;
 }
 input[type='range']::-ms-fill-lower, input[type='range']::-ms-fill-upper {
@@ -97,11 +97,11 @@ input[type='range']:focus {
   outline: none;
 }
 .js input[type='range']:focus::-webkit-slider-runnable-track {
-  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), linear-gradient(#fef200, #fef200) no-repeat #0170c2;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), linear-gradient(#fef200, #fef200) no-repeat #1e181a;
   background-size: 2em 100%, 60% 100%;
 }
 .js input[type='range']:focus::-moz-range-track {
-  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), linear-gradient(#fef200, #fef200) no-repeat #0170c2;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), linear-gradient(#fef200, #fef200) no-repeat #1e181a;
   background-size: 2em 100%, 60% 100%;
 }
 input[type='range']:focus::-ms-fill-lower {
@@ -128,7 +128,7 @@ input[type='range']:focus::-ms-thumb {
   opacity: .99;
 }
 input[type='range']:active::-ms-track {
-  background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box #0170c2;
+  background: radial-gradient(circle, #ffffff 0.125em, rgba(0, 0, 0, 0) 0.125em) 1em 50% content-box border-box #1e181a;
   background-size: 2em 100%;
 }
 input[type='range']:active::-ms-fill-lower {
