@@ -145,7 +145,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="citrus__suprême-info"><small class="torrent">(0 peers online)</small><time class="duration" data-value></time></div>
+                <div class="citrus__suprême-info"><small class="torrent">connecting...</small><time class="duration" data-value></time></div>
             </article>
         </template>
 
@@ -486,6 +486,42 @@ window.addEventListener("load", () => {
                 if(!loaded) {
                     client.add(magnetURI, (torrent) => {
                         torrent.files[0].appendTo(`#${uuid}`, readyFn);
+                        torrent.on('done', () => {
+                            let file = torrent.files[0];
+                            file.getBlobURL((err,url) => {
+                                if(err) throw err;
+                                let a = document.createElement("a");
+                                a.download = file.name;
+                                a.href = url;
+                                a.textContent = "Download";
+                                articleElement.appendChild(a);
+                            });
+                        });
+                        let peers = new Set();
+                        let displayElement = articleElement.querySelector(".torrent");
+                        let displayPeers = () => {
+                            displayElement.innerHTML = `connected to ${peers.size} peer${peers.size == 1 ? '' : 's'}`;
+                        };
+                        torrent.on('wire', (wire) => {
+                            let id = wire.peerId;
+                            peers.add(id);
+                            displayPeers();
+                            wire.once('close', () => {
+                                peers.delete(id);
+                                displayPeers();
+                            });
+                        });
+                        torrent.on('noPeers', () => {
+                            displayElement.innerHTML = 'no peers online (dead)';
+                        });
+                        torrent.on('error', (err) => {
+                            displayElement.innerHTML = err.message;
+                            errorMessage(err.message)
+                        });
+                        torrent.on('warning', (err) => {
+                            displayElement.innerHTML = err.message;
+                            errorMessage(err.message)
+                        });
                     });
                 }
             } else if(!waveformBoxElement.classList.contains("not-loaded")) {

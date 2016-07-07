@@ -167,15 +167,16 @@ footer hr {
     color: #fefbf6;
     padding: 2px 4px;
     margin-left: 0.5em;
-    vertical-align: top;
+    vertical-align: bottom;
 }
 
 .citrus__suprême .torrent {
-    opacity: 0;
+    font-size: x-small;
+    opacity: 1;
     transition: opacity 0.5s ease-out 0.5s;
 }
-.citrus__suprême:hover .torrent {
-    opacity: 1;
+.citrus__suprême--not-loaded:not(.citrus__suprême--loading) .torrent {
+    opacity: 0;
 }
 
 /*h1*/.citrus__suprême-title {
