@@ -23,6 +23,14 @@ body > footer {
     padding-left: 10%;
     padding-right: 10%;
 }
+@media (max-width: 499px) {
+    body > header,
+    body > main,
+    body > footer {
+        padding-left: 3.3333%;
+        padding-right: 6.6667%;
+    }
+}
 
 /**
  * header
@@ -94,6 +102,7 @@ footer hr {
 .citrus__suprême-playpause-column {
     flex: 0 1 auto;
     margin-right: 16px;
+    margin-top: 3em;
 }
 
 /*svg*/.citrus__suprême-playpause-button {
