@@ -178,6 +178,20 @@
         </template>
 
         <!--
+            disclaimer
+            -->
+        <template id="magnetshowdotheywork">
+            <aside class="avgrund-popup">
+                <h5><em>Traditional bittorrent clients such as qbittorrent, µtorrent, deluge, etc will <strong>NOT</strong> work with these magnets</em>.</h5><br><br>
+                <p>These links will <em>only</em> work with <a target="_blank" rel="noreferrer" href="https://github.com/feross/webtorrent/blob/master/docs/faq.md#can-webtorrent-clients-connect-to-normal-bittorrent-clients">webrtc-capable clients</a>.</p><br><br>
+                <p><a target="_blank" rel="noreferrer" href="https://webtorrent.io/desktop"><strong>WebTorrent Desktop</strong></a> is highly recommended.</p><br><br>
+                <div style="display:flex">
+                    <button class="ok cbutton cbutton--effect-sanja">OK</button>
+                </div>
+            </aside>
+        </template>
+
+        <!--
             needed for Avgrund
         -->
         <div class="avgrund-cover"></div>
@@ -286,6 +300,26 @@ window.addEventListener("load", () => {
         errorMessageElement.classList.add("fadeout");
         errorMessageElement.innerHTML = "";
     });
+
+    // juggalo pride
+    let magnetshowdotheywork = (e) => {
+        e.preventDefault();
+        openModal("magnetshowdotheywork");
+        let magnetshowdotheyworkModal = document.getElementById("magnetshowdotheyworkModal");
+        let okButton = magnetshowdotheyworkModal.querySelector("button.ok");
+        okButton.addEventListener("click", () => {
+            localStorage.setItem("magnetshowdotheywork","1");
+            [].forEach.call(document.querySelectorAll(".magnetURI"), (a) => a.removeEventListener("click", magnetshowdotheywork));
+            Avgrund.hide("#magnetshowdotheyworkModal");
+            
+            let a = e.target;
+            while(!(a instanceof HTMLAnchorElement)) {
+                if(a == null) return;
+                a = a.parentElement;
+            }
+            a.click();
+        });
+    };
 
     // waveform box
     let inAD2101WarWasBeginning = (containerElement) => {
@@ -418,11 +452,11 @@ window.addEventListener("load", () => {
     // audio files
     let addChild = (data, insertBefore=true) => {
 
-        let fileName = data.fileName;
-        let magnetURI = data.magnetURI;
+        let fileName    = data.fileName;
+        let magnetURI   = data.magnetURI;
         let waveformURI = data.waveformURI;
-        let duration = data.duration;
-        let createdAt = data.createdAt;
+        let duration    = data.duration;
+        let createdAt   = data.createdAt;
 
         let tpl = getTemplate("suprême");
 
@@ -546,7 +580,10 @@ window.addEventListener("load", () => {
  
         fileNameElement.innerHTML = fileName;
         magnetURIElement.href = magnetURI;
-
+        if(!localStorage.getItem("magnetshowdotheywork")) {
+            magnetURIElement.addEventListener("click", magnetshowdotheywork);
+        }
+        
         let createdAtDate = new Date(createdAt);
         createdAtElement.innerHTML = fdate(createdAtDate);
         createdAtElement.dataset.value = createdAt;
@@ -695,9 +732,9 @@ window.addEventListener("load", () => {
         openModal("uploadAndShare");
 
         let uploadAndShareModal = document.querySelector("#uploadAndShareModal");
-        let fileNameInput = uploadAndShareModal.querySelector("input[name='fileName']");
-        let okButton = uploadAndShareModal.querySelector("button.ok");
-        let cancelButton = uploadAndShareModal.querySelector("button.cancel");
+        let fileNameInput       = uploadAndShareModal.querySelector("input[name='fileName']");
+        let okButton            = uploadAndShareModal.querySelector("button.ok");
+        let cancelButton        = uploadAndShareModal.querySelector("button.cancel");
 
         fileNameInput.value = files[0].name.split(".").reverse().filter((v,k)=>k).reverse().join(".") || "";
 
