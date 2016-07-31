@@ -188,15 +188,17 @@ func Main() {
 
 	bindHttp := fmt.Sprintf("%s:%d", bindAddr, httpPort)
 	log.Println("    HTTPS Listening on", bindHttp)
-	go fasthttp.ListenAndServeTLS(bindHttp, certFile, keyFile, fasthttp.FSHandler(documentRoot, 0))
+	go func() {
+		log.Fatal(fasthttp.ListenAndServeTLS(bindHttp, certFile, keyFile, fasthttp.FSHandler(documentRoot, 0)))
+	}()
 
 	bindWebsocket := fmt.Sprintf("%s:%d", bindAddr, websocketPort)
 	log.Println("Websocket Listening on", bindWebsocket)
-	fasthttp.ListenAndServeTLS(bindWebsocket, certFile, keyFile, func(ctx *fasthttp.RequestCtx) {
+	log.Fatal(fasthttp.ListenAndServeTLS(bindWebsocket, certFile, keyFile, func(ctx *fasthttp.RequestCtx) {
 		upgrader := websocket.FastHTTPUpgrader{
 			CheckOrigin: func(ctx *fasthttp.RequestCtx) bool { return true },
 			Handler:     index,
 		}
 		upgrader.UpgradeHandler(ctx)
-	})
+	}))
 }
