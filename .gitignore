@@ -3,6 +3,7 @@
 client/node_modules
 npm_debug.log
 .scratch/*
-server/.db
+server/.db/*
+!server/.db/.keep
 *.pem
 *.crt
