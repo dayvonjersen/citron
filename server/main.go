@@ -153,7 +153,7 @@ func index(c *websocket.Conn) {
 var db datastore
 
 // generic publish-subscribe
-var ps = pubsub.New(0)
+var ps = pubsub.New(100)
 
 func main() {
 	// you do this in order to be able to defer or something.
