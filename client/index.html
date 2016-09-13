@@ -223,12 +223,16 @@ window.addEventListener("load", () => {
     // displays a box
     let openModal = (id) => {
         let modalId = id+"Modal";
-        if(!document.getElementById(modalId)) {
-            let tpl = getTemplate(id);
-            tpl.firstElementChild.setAttribute("id", modalId);
-            document.body.appendChild(tpl);
-        }
-        Avgrund.show("#"+modalId);
+        new Promise((resolve,reject) => {
+            if(!document.getElementById(modalId)) {
+                let tpl = getTemplate(id);
+                tpl.firstElementChild.setAttribute("id", modalId);
+                document.body.appendChild(tpl);
+                setTimeout(()=>resolve(true),10);
+            } else {
+                resolve(true);
+            }
+        }).then(()=>Avgrund.show("#"+modalId));
     };
 
     window.aboutModal = () => openModal("about");
