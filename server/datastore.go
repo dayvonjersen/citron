@@ -85,6 +85,9 @@ func (db *datastore) getRange(start, limit int) []string {
 	checkErr(err)
 	ls := lmodSlice{}
 	for _, file := range files {
+		if !strings.HasSuffix(file.Name(), ".json") {
+			continue
+		}
 		ls = append(ls, lmod{strings.TrimRight(file.Name(), ".json"), file.ModTime()})
 	}
 	dir.Close()
