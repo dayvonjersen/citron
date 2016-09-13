@@ -1,0 +1,10 @@
+{
+  "name": "citron-seedbox",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "magnet-uri": "^5.1.4",
+    "websocket": "^1.0.23",
+    "webtorrent-hybrid": "^1.0.4"
+  }
+}

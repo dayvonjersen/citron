@@ -1,0 +1,6 @@
+.scratch
+*.torrent
+*.mp3
+*.ogg
+*.wav
+node_modules/
