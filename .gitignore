@@ -7,3 +7,4 @@ server/.db/*
 !server/.db/.keep
 *.pem
 *.crt
+server/server

@@ -664,7 +664,7 @@ window.addEventListener("load", () => {
             return;
         }
         try {
-            let ws = new WebSocket("wss://" + location.host + ":12345/");
+            let ws = new WebSocket("wss://" + location.host.split(":")[0] + ":12345/");
             ws.onopen = () => {
                 sendPayload = (event,message) => {
                     let payload = JSON.stringify({event:event,message:message});
